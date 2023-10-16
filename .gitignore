@@ -1,39 +1,39 @@
-# Byte-compiled / optimized / DLL files
-__pycache__/
+#字节编译/优化/DLL文件
+__皮卡谢_/
 *.py[cod]
 *$py.class
 
-# C extensions
+#C分机
 *.so
 
-# Distribution / packaging
-.Python
-build/
-develop-eggs/
-dist/
-downloads/
-eggs/
+#分销/包装
+.巨蛇
+建造/建造
+发展蛋/
+区域/
+下载/
+蛋/蛋
 .eggs/
-lib/
-lib64/
-parts/
-sdist/
-var/
-wheels/
-share/python-wheels/
+联合国/
+64/
+零件/
+标准设计/
+VAR/
+轮子/
+份额/派顿轮/
 *.egg-info/
-.installed.cfg
+.已输入。
 *.egg
-MANIFEST
+明显的
 
-# PyInstaller
-#  Usually these files are written by a python script from a template
-#  before PyInstaller builds the exe, so as to inject date/other infos into it.
+#启动程序
+#这些文件通常是由一个模板中的评定器脚本编写的
+#在安装程序构建exe之前,以便向它注入日期/其他信息。
 *.manifest
 *.spec
 
-# Installer logs
-pip-log.txt
+#安装程序日志
+管道记录。
 pip-delete-this-directory.txt
 
 # Unit test / coverage reports
