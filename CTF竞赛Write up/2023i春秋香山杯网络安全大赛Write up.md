@@ -187,7 +187,6 @@ url就是网址链接，?就是拼接的意思，=给参数data传参
 这里就要用到上面讲到的**ASCII码chr()对应表**了
 
 ```php
-```php
 //查看flag文件内容的exp
 <?php
   error_reporting(0);
