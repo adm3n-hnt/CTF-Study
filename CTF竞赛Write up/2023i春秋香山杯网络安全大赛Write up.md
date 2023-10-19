@@ -239,9 +239,9 @@ cd /;more `php -r "echo chr(102).chr(49).chr(97).chr(103);"`
 >   5. echo输出命令
 >   6. chr()等等可以对照上面的ASCII码chr()对应表
 
-![在这里插入图片描述] ( https://img-blog.csdnimg.cn/1f7c9c3b9d514deead7bb176116097bc.png )
+![在这里插入图片描述](https://img-blog.csdnimg.cn/1f7c9c3b9d514deead7bb176116097bc.png)
 
-![在这里插入图片描述] ( https://img-blog.csdnimg.cn/7c3d60301e274fcba5df36841f1cbd67.png )
+![在这里插入图片描述](https://img-blog.csdnimg.cn/7c3d60301e274fcba5df36841f1cbd67.png)
 
 
 查看flag文件内容的exp:
