@@ -193,5 +193,32 @@ select命令被过滤了怎么办？我们还可以用handler命令进行查看�
 
 上传payload，回显flag：<br />![image.png](https://img-blog.csdnimg.cn/img_convert/1aa5220a282ceac998065c80dc38af21.png)
 
+## [SUCTF 2019]EasySQL 1
+
+题目环境：<br />![image.png](https://cdn.nlark.com/yuque/0/2023/png/36016220/1698664486260-6f6c0019-9130-4140-a1b2-9cceb09022f5.png#averageHue=%23f8f7f5&clientId=u0afe607f-2d1f-4&from=paste&height=202&id=uf83fd9bc&originHeight=253&originWidth=876&originalType=binary&ratio=1.25&rotation=0&showTitle=false&size=21417&status=done&style=none&taskId=u889268b8-2948-42df-b872-3ff591d0b4b&title=&width=700.8)
+> 把你的旗子给我，我会告诉你旗子是不是对的。
+
+判断注入类型<br />`1'`<br />回显结果<br />![image.png](https://cdn.nlark.com/yuque/0/2023/png/36016220/1698664852183-4cfdd7bb-3ea9-4ce9-be1c-96f1fa803094.png#averageHue=%23f6f4f2&clientId=u0afe607f-2d1f-4&from=paste&height=150&id=uccc2f919&originHeight=187&originWidth=872&originalType=binary&ratio=1.25&rotation=0&showTitle=false&size=21241&status=done&style=none&taskId=ub4f7196d-1f32-4f95-9828-3ef2dcffc4d&title=&width=697.6)
+> 不是字符型SQL注入
+
+`1`<br />回显结果<br />![image.png](https://cdn.nlark.com/yuque/0/2023/png/36016220/1698664998585-28a658de-ffeb-4417-8a45-efb1eb80f4a8.png#averageHue=%23f7f6f4&clientId=u0afe607f-2d1f-4&from=paste&height=186&id=u4da01599&originHeight=232&originWidth=876&originalType=binary&ratio=1.25&rotation=0&showTitle=false&size=24755&status=done&style=none&taskId=uaa1a1096-cd48-4975-9a5a-9cd4a963bf0&title=&width=700.8)
+> 数字型SQL注入
+
+查所有数据库,采用堆叠注入<br />`1;show databases;`<br />![image.png](https://cdn.nlark.com/yuque/0/2023/png/36016220/1698665929401-d1ed791e-3482-437f-922e-d2013b67d69e.png#averageHue=%23f7f6f4&clientId=u0afe607f-2d1f-4&from=paste&height=175&id=u4356b753&originHeight=219&originWidth=1725&originalType=binary&ratio=1.25&rotation=0&showTitle=false&size=36187&status=done&style=none&taskId=u11f7d0dc-8874-456c-b792-bd23c079d14&title=&width=1380)<br />查看所有数据表<br />`1;show tables;`<br />![image.png](https://cdn.nlark.com/yuque/0/2023/png/36016220/1698733249276-b42032e3-6c64-471b-a9de-6a02dafdec20.png#averageHue=%23f9f8f7&clientId=u250485b3-3c63-4&from=paste&height=138&id=u666a75c4&originHeight=172&originWidth=748&originalType=binary&ratio=1.25&rotation=0&showTitle=false&size=10564&status=done&style=none&taskId=ue2f2e90a-b7c3-402f-8ec9-55e97ce2274&title=&width=598.4)<br />尝试爆Flag数据表的字段<br />`1;show columns from Flag;`<br />![image.png](https://cdn.nlark.com/yuque/0/2023/png/36016220/1698736004092-1706d5e8-718a-4c60-b84c-d8138080676f.png#averageHue=%23f5f3f1&clientId=u250485b3-3c63-4&from=paste&height=99&id=udd705357&originHeight=124&originWidth=506&originalType=binary&ratio=1.25&rotation=0&showTitle=false&size=6587&status=done&style=none&taskId=uc246e44f-a815-4917-8a0b-541bf4ebe3c&title=&width=404.8)
+> 回显错误
+
+到这里，大佬们直接猜出了后端语句<br />`select $_GET['query'] || flag from Flag`<br />我直接好家伙，大佬果然是大佬<br />||就是SQL里面的逻辑或运算符<br />**解法1：**<br />`*,1`<br />那么传到后端语句就是<br />`select *,1 || flag from Flag`<br />这里我问了下文心一言，看完我也理解了
+> 这段SQL代码的含义是：从Flag表中选择所有的列，以及由列flag的值与数字1进行连接生成的新列。
+> 具体来说：
+> select *：选择所有的列。
+> 1 || flag：这是SQL中的字符串连接操作。它将数字1与flag列的值进行连接。对于每一行，都会生成一个新的字符串，这个字符串是数字1后跟着flag列的值。如果flag列的值本身是一个字符串，那么这两个字符串将被连接起来。
+> from Flag：从Flag表中选择数据。
+> 因此，这段代码的输出结果将包含Flag表的所有列，以及一个名为“1”的列，该列的值是flag列的值与数字1的连接。
+
+大致意思，就是查看数据表Flag的所有列内容，然后添加了一个由列flag的值与数字1进行连接生成的新列，这个新的列名就叫1，那么猜测或者说就是flag被过滤，我们还能查到flag列的值，因为flag的值复制到了新的列1。<br />`*,0`<br />![image.png](https://cdn.nlark.com/yuque/0/2023/png/36016220/1698737425920-147348c3-d409-45b9-9b64-209c06dd4d8a.png#averageHue=%23f8f7f6&clientId=u250485b3-3c63-4&from=paste&height=138&id=u45a419d4&originHeight=172&originWidth=896&originalType=binary&ratio=1.25&rotation=0&showTitle=false&size=12977&status=done&style=none&taskId=ub124435b-76cb-4bd6-adb0-d78454b724a&title=&width=716.8)<br />可以明显看到新的列名0和flag的值连接起来了<br />`*,1`<br />![image.png](https://cdn.nlark.com/yuque/0/2023/png/36016220/1698737517157-c053430c-0783-483f-88da-60128f6c574b.png#averageHue=%23f9f8f7&clientId=u250485b3-3c63-4&from=paste&height=134&id=udcd5aa28&originHeight=168&originWidth=872&originalType=binary&ratio=1.25&rotation=0&showTitle=false&size=11928&status=done&style=none&taskId=u24a871c4-5ee0-488d-ac55-0c5553132bc&title=&width=697.6)<br />对吧，新列名为1<br />`*,2`<br />![image.png](https://cdn.nlark.com/yuque/0/2023/png/36016220/1698737591497-1936851a-330a-466f-a205-11b2f7e39480.png#averageHue=%23f8f7f6&clientId=u250485b3-3c63-4&from=paste&height=132&id=uc69c71a0&originHeight=165&originWidth=900&originalType=binary&ratio=1.25&rotation=0&showTitle=false&size=12687&status=done&style=none&taskId=ua5ebc9c4-61a9-45ad-8be0-9b8ba35a996&title=&width=720)<br />还是为1，所有还可以看出Flag数据表的列只能是两个<br />**解法2：**<br />既然题目内置的是逻辑或运算符，那咱们直接把它改成字符串连接符不就好了嘛（滑稽）<br />使用set方法定义sql_mode参数设置，PIPES_AS_CONCAT字符串连接符`select 1`查询第一列<br />`1;set sql_mode=PIPES_AS_CONCAT;select 1`<br />回显结果：<br />![image.png](https://cdn.nlark.com/yuque/0/2023/png/36016220/1698738692889-3662a38c-076f-43de-88a8-67ac47a48fe4.png#averageHue=%23f5f3f0&clientId=u250485b3-3c63-4&from=paste&height=171&id=u8a1c556a&originHeight=214&originWidth=977&originalType=binary&ratio=1.25&rotation=0&showTitle=false&size=29510&status=done&style=none&taskId=uf50e8da8-0feb-41e0-ae03-bd8c13b3cdc&title=&width=781.6)<br />可以明显看出解法1和解法2的回显结果有明显不同
+
+
+
+
 
 
