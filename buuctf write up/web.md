@@ -302,6 +302,52 @@ F12查看隐藏文件<br />![image.png](https://cdn.nlark.com/yuque/0/2023/png/3
 
 原文链接：https://blog.csdn.net/m0_73734159/article/details/134185235?csdn_share_tail=%7B%22type%22%3A%22blog%22%2C%22rType%22%3A%22article%22%2C%22rId%22%3A%22134185235%22%2C%22source%22%3A%22m0_73734159%22%7D
 
+## [极客大挑战 2019]Http 1
+
+题目环境：<br />![image.png](https://cdn.nlark.com/yuque/0/2023/png/36016220/1698990328197-27134373-3f1d-46d6-b10e-3b51bc0b1f09.png#averageHue=%23453934&clientId=u6d992860-e414-4&from=paste&height=760&id=ub39e4f20&originHeight=950&originWidth=1911&originalType=binary&ratio=1.25&rotation=0&showTitle=false&size=484193&status=done&style=none&taskId=u6f6dd259-6921-4812-ab3c-5e6cd8ac23b&title=&width=1528.8)<br />![image.png](https://cdn.nlark.com/yuque/0/2023/png/36016220/1698990353259-4b9c2656-0b60-40b7-8217-c6fb4ef298bf.png#averageHue=%2330948e&clientId=u6d992860-e414-4&from=paste&height=760&id=u0c8a0784&originHeight=950&originWidth=1911&originalType=binary&ratio=1.25&rotation=0&showTitle=false&size=150914&status=done&style=none&taskId=ua96770ea-1d31-47d1-be70-74397369cdb&title=&width=1528.8)
+> 看起来挺花里胡哨的
+
+F12查看源代码寻找隐藏文件<br />![image.png](https://cdn.nlark.com/yuque/0/2023/png/36016220/1698990467697-5a94a3a8-3963-41fd-845e-577cd62731c3.png#averageHue=%23fbfafa&clientId=u6d992860-e414-4&from=paste&height=760&id=u5d2ad954&originHeight=950&originWidth=1911&originalType=binary&ratio=1.25&rotation=0&showTitle=false&size=57015&status=done&style=none&taskId=u99aa9117-c375-4b45-9d7f-b94601bedee&title=&width=1528.8)
+> 这是啥子呀，果然防不胜防
+
+点击隐藏文件Secret.php<br />![image.png](https://cdn.nlark.com/yuque/0/2023/png/36016220/1698990922187-da1a9199-8aa3-495a-8b56-b0d8b534593c.png#averageHue=%23020202&clientId=u6d992860-e414-4&from=paste&height=758&id=u57fdcfe0&originHeight=948&originWidth=1908&originalType=binary&ratio=1.25&rotation=0&showTitle=false&size=622427&status=done&style=none&taskId=u20a704f7-c6fb-4ddf-abc2-53f75f271db&title=&width=1526.4)
+> 它不是来自这个地址的请求
+> 报头：https://Sycsecret.buuoj.cn
+
+**需要抓包，在抓包前了解部分数据包参数**
+> **GET:到**
+> **Host:来自**
+> **User-Agent: 用户-代理**
+> **Accept: 接受**
+> **Accept-Language: 接受-语言**
+> **Accept-Encoding: 接受-编码**
+> **Connection: 连接**
+> **Upgrade-Insecure-Requests: 升级-不安全的-请求**
+> **Content-Length: 内容长度**
+> **Cache-Control: 缓存-控制**
+> **X-Forwarded-For: HTTP的请求端真实的IP**
+> **Request: 请求**
+> **Response: 响应**
+> **Referer：请求报头**
+
+burpsuite抓包<br />![image.png](https://cdn.nlark.com/yuque/0/2023/png/36016220/1698991658580-e48277a4-096b-405a-bc0b-2f4e477ef9ad.png#averageHue=%23aa6a18&clientId=u6d992860-e414-4&from=paste&height=656&id=ue99649d2&originHeight=820&originWidth=1718&originalType=binary&ratio=1.25&rotation=0&showTitle=false&size=510986&status=done&style=none&taskId=uf25b13a0-1f92-4822-b74d-8255361dcbf&title=&width=1374.4)<br />![image.png](https://cdn.nlark.com/yuque/0/2023/png/36016220/1698991715953-d9aceb54-16c0-4e1a-ad4f-3774c0394d5a.png#averageHue=%23aa6918&clientId=u6d992860-e414-4&from=paste&height=658&id=u417bfe17&originHeight=822&originWidth=1718&originalType=binary&ratio=1.25&rotation=0&showTitle=false&size=523200&status=done&style=none&taskId=uecfe4f58-88cb-44f0-8b1f-05c8a1b8aac&title=&width=1374.4)<br />回显结果：<br />![image.png](https://cdn.nlark.com/yuque/0/2023/png/36016220/1698991804022-dc92d090-6c24-4a30-9dff-ea2836e906a0.png#averageHue=%23f9f9f9&clientId=u6d992860-e414-4&from=paste&height=750&id=ua4d38ee7&originHeight=938&originWidth=1718&originalType=binary&ratio=1.25&rotation=0&showTitle=false&size=174464&status=done&style=none&taskId=u5e9f28b7-d25f-47bb-abd7-4c32ac50822&title=&width=1374.4)<br />右键送去重放<br />添加Referer请求报头<br />![image.png](https://cdn.nlark.com/yuque/0/2023/png/36016220/1698991912946-cd4ea991-f6ac-4825-a49d-f4f624c8c82f.png#averageHue=%23f9f9f9&clientId=u6d992860-e414-4&from=paste&height=726&id=u0b6a762c&originHeight=907&originWidth=1718&originalType=binary&ratio=1.25&rotation=0&showTitle=false&size=169293&status=done&style=none&taskId=ub324138f-725a-44d1-b1d2-98c3b52e608&title=&width=1374.4)
+> 请使用Syclover浏览器进行访问
+
+修改User-Agent用户代理为Syclover浏览器<br />![image.png](https://cdn.nlark.com/yuque/0/2023/png/36016220/1698992282241-b1518884-034a-41b7-be7d-66c87b77272d.png#averageHue=%23f9f9f8&clientId=u6d992860-e414-4&from=paste&height=729&id=ue75a0681&originHeight=911&originWidth=1718&originalType=binary&ratio=1.25&rotation=0&showTitle=false&size=180576&status=done&style=none&taskId=ub516417a-7799-40e1-b75e-2fb021d2360&title=&width=1374.4)
+> No!!! you can only read this locally!!!
+> 不! ! ! 你只能在本地阅读! ! ！
+
+查看请求端本地的真实IP<br />Kali终端输命令**ifconfig**,箭头后面即为真实IP<br />![image.png](https://cdn.nlark.com/yuque/0/2023/png/36016220/1698992543612-8fa5d47e-e002-4220-aefb-ba75add21881.png#averageHue=%231c1f28&clientId=u6d992860-e414-4&from=paste&height=538&id=u97263fe4&originHeight=672&originWidth=144&originalType=binary&ratio=1.25&rotation=0&showTitle=false&size=42040&status=done&style=none&taskId=u48a1cf09-6933-4c7f-b978-e004cbe90d3&title=&width=115.2)<br />添加X-Forwarded-For请求端本地真实的IP<br />![image.png](https://cdn.nlark.com/yuque/0/2023/png/36016220/1698992673812-03aed018-25f5-47bf-abb9-48aaa8e4988a.png#averageHue=%23f9f9f9&clientId=u6d992860-e414-4&from=paste&height=727&id=u8f49b4b8&originHeight=909&originWidth=1718&originalType=binary&ratio=1.25&rotation=0&showTitle=false&size=182061&status=done&style=none&taskId=u6ced2fd6-f039-4f41-965b-3eae8bdf979&title=&width=1374.4)<br />**得到flag：**<br />`flag{a165c953-c9d8-4d9d-9ee6-39390b05d903}`
+
+原文链接：https://blog.csdn.net/m0_73734159/article/details/134202493?csdn_share_tail=%7B%22type%22%3A%22blog%22%2C%22rType%22%3A%22article%22%2C%22rId%22%3A%22134202493%22%2C%22source%22%3A%22m0_73734159%22%7D
+
+
+
+
+
+
+
+
 
 
 
