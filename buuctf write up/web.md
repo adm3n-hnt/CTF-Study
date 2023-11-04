@@ -341,6 +341,34 @@ burpsuite抓包<br />![image.png](https://cdn.nlark.com/yuque/0/2023/png/3601622
 
 原文链接：https://blog.csdn.net/m0_73734159/article/details/134202493?csdn_share_tail=%7B%22type%22%3A%22blog%22%2C%22rType%22%3A%22article%22%2C%22rId%22%3A%22134202493%22%2C%22source%22%3A%22m0_73734159%22%7D
 
+## [极客大挑战 2019]Knife 1（两种解法）
+
+题目环境：<br />![image.png](https://cdn.nlark.com/yuque/0/2023/png/36016220/1699102398967-1c673a5a-c5ba-42c7-9dd4-24c1bf9eb6e0.png#averageHue=%23161514&clientId=uec6e18bd-ad37-4&from=paste&height=831&id=u99b8efe8&originHeight=1039&originWidth=1908&originalType=binary&ratio=1.25&rotation=0&showTitle=false&size=61282&status=done&style=none&taskId=ub79d083f-737d-4701-82fc-2a35ad2648e&title=&width=1526.4)
+> 这道题主要考察中国菜刀和中国蚁剑的使用方法
+> 以及对PHP一句话木马的理解
+> 咱们先了解一下PHP一句话木马，好吗？
+
+`**eval($_POST["Syc"]);**`
+> **eval是PHP代码执行函数，**把字符串按照 PHP 代码来执行。
+> $_POST PHP方法将参数Syc作为POST传参方式
+> 可以理解为题目作者已经给我们了连接服务器的密码Syc，我们只需要使用工具连接题目地址就可以啦
+
+**一句话木马原理（来自文心一言）**
+> 一句话木马是一种精简但高效的木马，只需要一行代码即可实现和大马（全功能木马）相当的功能。其特点是短小精悍，可以用来绕过WAF（Web Application Firewall）的检测。
+> 一句话木马通常通过GET、POST、COOKIE这三种方式向一个网站提交数据，并利用PHP的eval函数将接收到的数据当作PHP代码来执行。例如，以下是一个经典的一句话木马：eval(base64_decode(''));，其中eval是执行命令的函数，base64_decode('')是将传递的数据解码为PHP代码的部分。
+> 为了绕过WAF的检测，一句话木马出现了无数种变形，但本质是不变的：木马的函数执行了我们发送的命令。由于其高度的灵活性和隐蔽性，一句话木马经常被用于进行恶意攻击，如窃取敏感数据、实施CC攻击等。
+> 需要注意的是，使用一句话木马是非法行为，可能导致严重的后果，包括但不限于罚款、监禁等。因此，建议遵守相关法律法规，不要使用或参与使用这类恶意软件。
+
+<a name="lNRQ1"></a>
+## 步入正题
+<a name="vm3kv"></a>
+### 解法1：中国菜刀
+跟着操作走即可：<br />打开中国菜刀鼠标右键添加<br />![image.png](https://cdn.nlark.com/yuque/0/2023/png/36016220/1699103497991-4a817c01-45bc-4fdd-a665-48f3b8f55876.png#averageHue=%23fcfcfc&clientId=uec6e18bd-ad37-4&from=paste&height=771&id=u94e10770&originHeight=964&originWidth=1713&originalType=binary&ratio=1.25&rotation=0&showTitle=false&size=69547&status=done&style=none&taskId=uc2b28cbe-dcad-40fa-b2ef-198fb55731a&title=&width=1370.4)<br />添加题目地址和连接密码以及选择PHP脚本类型即可<br />![image.png](https://cdn.nlark.com/yuque/0/2023/png/36016220/1699103800936-fb54142e-31e8-4ce9-8f57-c512d1151de7.png#averageHue=%23fbfbfb&clientId=uec6e18bd-ad37-4&from=paste&height=784&id=u584f1abb&originHeight=980&originWidth=1720&originalType=binary&ratio=1.25&rotation=0&showTitle=false&size=110120&status=done&style=none&taskId=u21513963-5cac-4762-a022-11f0d283376&title=&width=1376)<br />双击<br />![image.png](https://cdn.nlark.com/yuque/0/2023/png/36016220/1699103863690-a0405970-c5d3-4c3b-a8e4-cb6fed9cebc5.png#averageHue=%23fcfcfc&clientId=uec6e18bd-ad37-4&from=paste&height=784&id=u52dba783&originHeight=980&originWidth=1720&originalType=binary&ratio=1.25&rotation=0&showTitle=false&size=69316&status=done&style=none&taskId=u7520aa67-ac1a-40af-bbdc-947e0858aa6&title=&width=1376)<br />点击/根目录即可找到flag文件<br />![image.png](https://cdn.nlark.com/yuque/0/2023/png/36016220/1699103944678-830f2e44-9e4c-4231-b65f-84c3e2d1be60.png#averageHue=%23fbfbfb&clientId=uec6e18bd-ad37-4&from=paste&height=750&id=u30a57713&originHeight=938&originWidth=1718&originalType=binary&ratio=1.25&rotation=0&showTitle=false&size=148628&status=done&style=none&taskId=uf6f40684-cc11-437c-8ab5-d1b390416ed&title=&width=1374.4)<br />双击/根目录下的flag文件<br />![image.png](https://cdn.nlark.com/yuque/0/2023/png/36016220/1699103993637-4f7fad92-c983-499d-999f-92b7aba79e57.png#averageHue=%23fcfcfc&clientId=uec6e18bd-ad37-4&from=paste&height=784&id=uebf17e70&originHeight=980&originWidth=1720&originalType=binary&ratio=1.25&rotation=0&showTitle=false&size=93922&status=done&style=none&taskId=uff58ad7e-4cf9-49a0-b147-8e0d0f0c5e5&title=&width=1376)<br />**得到flag：**<br />`flag{84829618-f50c-4c79-8212-2154477d1f99}`
+<a name="yTIlb"></a>
+### 解法2：中国蚁剑
+方法和中国菜刀大同小异，这里不再赘述。<br />![image.png](https://cdn.nlark.com/yuque/0/2023/png/36016220/1699104252981-f49d9cb7-ce07-45b4-a30b-ef3fb2af5a59.png#averageHue=%23f6f6f6&clientId=uec6e18bd-ad37-4&from=paste&height=693&id=u45f50153&originHeight=866&originWidth=1284&originalType=binary&ratio=1.25&rotation=0&showTitle=false&size=48809&status=done&style=none&taskId=uc034abd4-e9ea-49aa-b459-ba450c228b3&title=&width=1027.2)<br />![image.png](https://cdn.nlark.com/yuque/0/2023/png/36016220/1699104312888-9ee32bf2-4024-471a-926c-fa1dbbf658d3.png#averageHue=%23efeeee&clientId=uec6e18bd-ad37-4&from=paste&height=693&id=u4c908978&originHeight=866&originWidth=1284&originalType=binary&ratio=1.25&rotation=0&showTitle=false&size=69963&status=done&style=none&taskId=uc2e57990-b15a-4ba0-94f5-f3d64918aa3&title=&width=1027.2)![image.png](https://cdn.nlark.com/yuque/0/2023/png/36016220/1699104356323-75b25b2a-c676-4590-8a22-4359f9b9edc6.png#averageHue=%23f8f7f7&clientId=uec6e18bd-ad37-4&from=paste&height=693&id=uc69882c7&originHeight=866&originWidth=1284&originalType=binary&ratio=1.25&rotation=0&showTitle=false&size=41518&status=done&style=none&taskId=ubb474a87-643c-474a-90fb-5a26828ea41&title=&width=1027.2)![image.png](https://cdn.nlark.com/yuque/0/2023/png/36016220/1699104397368-d7cc31ba-8383-4815-b4e4-f27d3a3bcd2f.png#averageHue=%23f3f3f3&clientId=uec6e18bd-ad37-4&from=paste&height=864&id=u2169ae3e&originHeight=1080&originWidth=1920&originalType=binary&ratio=1.25&rotation=0&showTitle=false&size=140879&status=done&style=none&taskId=ufacb42dd-a578-48b2-a6bc-449e491e8f9&title=&width=1536)![image.png](https://cdn.nlark.com/yuque/0/2023/png/36016220/1699104425042-71b1c279-975d-4029-a627-fb29d9543b17.png#averageHue=%23fafafa&clientId=uec6e18bd-ad37-4&from=paste&height=864&id=u5e3f1009&originHeight=1080&originWidth=1920&originalType=binary&ratio=1.25&rotation=0&showTitle=false&size=51457&status=done&style=none&taskId=u874969c2-c708-4796-bed0-6dd6c66cba3&title=&width=1536)<br />**得到flag：**<br />`flag{84829618-f50c-4c79-8212-2154477d1f99}`<br />**感谢大家，祝大家技术更进一步！**
+
+原文链接：https://blog.csdn.net/m0_73734159/article/details/134223817?csdn_share_tail=%7B%22type%22%3A%22blog%22%2C%22rType%22%3A%22article%22%2C%22rId%22%3A%22134223817%22%2C%22source%22%3A%22m0_73734159%22%7D
 
 
 
