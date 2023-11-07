@@ -280,7 +280,7 @@ F12查看隐藏文件<br />![image.png](https://cdn.nlark.com/yuque/0/2023/png/3
 > 报错
 > 抛弃堆叠注入
 
-**步入正题**<br />`1' order by 4#`<br />回显结果<br />![image.png](https://cdn.nlark.com/yuque/0/2023/png/36016220/1698910383188-ae75dce9-d7c8-4dd4-b815-71fb6ba05d21.png#averageHue=%231e1e1d&clientId=u93f0fa3e-5d73-4&from=paste&height=830&id=u5a0a5819&originHeight=1037&originWidth=1920&originalType=binary&ratio=1.25&rotation=0&showTitle=false&size=600087&status=done&style=none&taskId=u58510ae9-b899-4664-bbc6-cd4a4a0d405&title=&width=1536)
+步入正题<br />`1' order by 4#`<br />回显结果<br />![image.png](https://cdn.nlark.com/yuque/0/2023/png/36016220/1698910383188-ae75dce9-d7c8-4dd4-b815-71fb6ba05d21.png#averageHue=%231e1e1d&clientId=u93f0fa3e-5d73-4&from=paste&height=830&id=u5a0a5819&originHeight=1037&originWidth=1920&originalType=binary&ratio=1.25&rotation=0&showTitle=false&size=600087&status=done&style=none&taskId=u58510ae9-b899-4664-bbc6-cd4a4a0d405&title=&width=1536)
 > 成功，但是不存在第4列
 > 同时验证了猜想不能使用堆叠注入
 
