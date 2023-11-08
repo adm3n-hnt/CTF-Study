@@ -492,6 +492,59 @@ payload:<br />![image.png](https://cdn.nlark.com/yuque/0/2023/png/36016220/16994
 
 原文链接：https://blog.csdn.net/m0_73734159/article/details/134291787?csdn_share_tail=%7B%22type%22%3A%22blog%22%2C%22rType%22%3A%22article%22%2C%22rId%22%3A%22134291787%22%2C%22source%22%3A%22m0_73734159%22%7D
 
+## [ACTF2020 新生赛]BackupFile 1
+
+题目环境：<br />![image.png](https://cdn.nlark.com/yuque/0/2023/png/36016220/1699437318899-f490014a-c2b6-4077-8ce5-d44416de3811.png#averageHue=%23f9f8f6&clientId=u9148c047-492a-4&from=paste&height=157&id=u86050bb3&originHeight=196&originWidth=1286&originalType=binary&ratio=1.25&rotation=0&showTitle=false&size=23247&status=done&style=none&taskId=uc919bf43-98e2-4b5f-96a6-e7d9dad2a55&title=&width=1028.8)<br />![image.png](https://cdn.nlark.com/yuque/0/2023/png/36016220/1699437347831-fb5923aa-7d85-453a-8d70-1830e44d9392.png#averageHue=%23f8f8f8&clientId=u9148c047-492a-4&from=paste&height=182&id=u4dd1855d&originHeight=227&originWidth=1550&originalType=binary&ratio=1.25&rotation=0&showTitle=false&size=22942&status=done&style=none&taskId=u0ffd6849-225e-489c-9a91-468f696a81f&title=&width=1240)
+> 好好好，让找源文件是吧？咱们二话不说直接扫它后台
+
+使用dirsearch工具扫描网站后台（博主有这个工具的压缩包，可以私聊我领取）<br />`python dirsearch.py -u http://0d418151-ebaf-4f26-86b2-5363ed16530f.node4.buuoj.cn:81/`<br />![image.png](https://cdn.nlark.com/yuque/0/2023/png/36016220/1699437568047-dd25bde1-bbb1-422a-bc70-6a21e16ed778.png#averageHue=%23151515&clientId=u9148c047-492a-4&from=paste&height=864&id=u5c93aec1&originHeight=1080&originWidth=1920&originalType=binary&ratio=1.25&rotation=0&showTitle=false&size=175506&status=done&style=none&taskId=ud57439dd-f54a-470d-9e7e-b9193978ca5&title=&width=1536)<br />探测存活文件
+> ![image.png](https://cdn.nlark.com/yuque/0/2023/png/36016220/1699437629326-e705b61d-ab1b-493f-b407-54282d088e5d.png#averageHue=%23151515&clientId=u9148c047-492a-4&from=paste&height=864&id=u7557af81&originHeight=1080&originWidth=1920&originalType=binary&ratio=1.25&rotation=0&showTitle=false&size=231180&status=done&style=none&taskId=uf3cc6d2d-a3d1-40c9-8216-88b55c2aaf0&title=&width=1536)
+> 不要一惊一乍哦，0B内存这是假的flag.php文件
+
+![image.png](https://cdn.nlark.com/yuque/0/2023/png/36016220/1699437718622-6d2339a9-199f-4c1d-96a4-09bfddf58689.png#averageHue=%23151515&clientId=u9148c047-492a-4&from=paste&height=864&id=u5e0bfbe4&originHeight=1080&originWidth=1920&originalType=binary&ratio=1.25&rotation=0&showTitle=false&size=230671&status=done&style=none&taskId=ua0f11891-2c43-4f75-a2ab-55bab4be3aa&title=&width=1536)
+> 探测出存活文件index.php.bak
+> bak文件后缀是备份文件
+
+**下载index.php.bak文件**<br />![image.png](https://cdn.nlark.com/yuque/0/2023/png/36016220/1699437861093-f8bc72d8-9153-45d2-90ad-3e585bb6d5e4.png#averageHue=%23f8f6f4&clientId=u9148c047-492a-4&from=paste&height=128&id=ub1394194&originHeight=160&originWidth=1174&originalType=binary&ratio=1.25&rotation=0&showTitle=false&size=23543&status=done&style=none&taskId=u1cddfdc5-c7ab-4f17-97e9-e550a4f8f45&title=&width=939.2)<br />回车即可下载<br />![image.png](https://cdn.nlark.com/yuque/0/2023/png/36016220/1699437908696-382c061b-871b-4847-a464-f205f6571675.png#averageHue=%23c9ddc2&clientId=u9148c047-492a-4&from=paste&height=34&id=u6f66c972&originHeight=43&originWidth=787&originalType=binary&ratio=1.25&rotation=0&showTitle=false&size=4679&status=done&style=none&taskId=udc14a423-a5bb-43be-afb1-315891be798&title=&width=629.6)<br />使用记事本或者PHP编译器等工具打开即可<br />![image.png](https://cdn.nlark.com/yuque/0/2023/png/36016220/1699437992198-79a7a542-f0db-4052-ad89-7932c793dffa.png#averageHue=%232c2c2b&clientId=u9148c047-492a-4&from=paste&height=493&id=u3ce2dc4b&originHeight=616&originWidth=1251&originalType=binary&ratio=1.25&rotation=0&showTitle=false&size=57897&status=done&style=none&taskId=ub13d5897-19f0-46fa-86bf-01033ec72e9&title=&width=1000.8)
+```php
+<?php
+  include_once "flag.php";
+
+if(isset($_GET['key'])) {
+  $key = $_GET['key'];
+  if(!is_numeric($key)) {
+    exit("Just num!");
+  }
+  $key = intval($key);
+  $str = "123ffwsfwefwf24r2f32ir23jrw923rskfjwtsw54w3";
+  if($key == $str) {
+    echo $flag;
+  }
+}
+else {
+  echo "Try to find out source file!";
+}
+```
+PHP代码审计
+> 包含flag.php文件
+> 通过GET方式传参的参数key
+> _is_numeric()函数_用于检测变量是否为数字或数字字符串，那么加上感叹号就是如果不是数字或数字字符串就输出Just num!并退出
+> **intval()** 函数用于获取变量的整数值
+> if语句如果key变量与str变量相等则返回TRUE并输出flag
+> else语句如果以上条件全部都不符合条件，则输出Try to find out source file!
+
+进一步分析
+> 看完代码审计是不是很慌，我猜你已经注意到了“key变量和str变量的值是不可能相等的！”
+> 哪怎么搞呢？
+> 别急，作者还给了我们一个惊喜！
+> “==”PHP弱比较逻辑运算符
+> PHP弱比较呢**只是要求运算符两边的数据类型必须一致**并没有要求两个变量的值一定要相等
+> **str变量是字符串，同时要求key变量必须是数字，并且str字符串里面存在123，所以key=123即可获得flag**
+
+构造payload：<br />`?key=123`<br />上传payload：<br />![image.png](https://cdn.nlark.com/yuque/0/2023/png/36016220/1699439157158-02904975-c20e-4cef-bc69-d35076c90472.png#averageHue=%23f5f3f0&clientId=u9148c047-492a-4&from=paste&height=102&id=u66c6819c&originHeight=127&originWidth=1305&originalType=binary&ratio=1.25&rotation=0&showTitle=false&size=26868&status=done&style=none&taskId=u2631ad00-973d-430e-9468-443473b4b3b&title=&width=1044)<br />**得到flag：**<br />`flag{b7a1c0e0-3a3a-4267-999d-ad788f286d41}`
+
+原文链接：https://blog.csdn.net/m0_73734159/article/details/134295827?spm=1001.2014.3001.5501
+
 
 
 
