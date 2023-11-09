@@ -545,6 +545,114 @@ PHP代码审计
 
 原文链接：https://blog.csdn.net/m0_73734159/article/details/134295827?spm=1001.2014.3001.5501
 
+## 通过一道题目带你深入了解WAF特性、PHP超级打印函数、ASCII码chr()对应表等原理[RoarCTF 2019]Easy Calc 1
+
+题目环境：<br />![image.png](https://cdn.nlark.com/yuque/0/2023/png/36016220/1699510500894-57376273-5a70-4159-9409-8f7d90ad0951.png#averageHue=%23fcfcfb&clientId=u840c2afd-8358-4&from=paste&height=301&id=bXRN5&originHeight=376&originWidth=1681&originalType=binary&ratio=1.25&rotation=0&showTitle=false&size=31363&status=done&style=none&taskId=u2957c225-b710-4784-9569-2d8c7a3a0db&title=&width=1344.8)
+> 依此输入一下内容并查看回显结果
+> 1+1
+> 1'
+> index.php
+> ls
+
+![image.png](https://cdn.nlark.com/yuque/0/2023/png/36016220/1699511492011-5bfde507-6642-4ec1-a0b7-c7c180e7f0f3.png#averageHue=%23fdfcfc&clientId=u840c2afd-8358-4&from=paste&height=383&id=udedf8d33&originHeight=479&originWidth=1675&originalType=binary&ratio=1.25&rotation=0&showTitle=false&size=35266&status=done&style=none&taskId=ub6b019a0-47ab-4142-83bf-28d211bd68c&title=&width=1340)<br />![image.png](https://cdn.nlark.com/yuque/0/2023/png/36016220/1699511552909-bb47d27e-c7d8-446a-b67d-610ca400800d.png#averageHue=%23fcfcfb&clientId=u840c2afd-8358-4&from=paste&height=353&id=u873c80b3&originHeight=441&originWidth=1691&originalType=binary&ratio=1.25&rotation=0&showTitle=false&size=41023&status=done&style=none&taskId=ua231f16b-c1f8-4f0a-bee8-87a62baf8d0&title=&width=1352.8)<br />![image.png](https://cdn.nlark.com/yuque/0/2023/png/36016220/1699511590598-2d9658a7-3aa1-4447-92a9-41ea8c199b5a.png#averageHue=%23fdfdfc&clientId=u840c2afd-8358-4&from=paste&height=529&id=uc840b454&originHeight=661&originWidth=1689&originalType=binary&ratio=1.25&rotation=0&showTitle=false&size=53863&status=done&style=none&taskId=ue81d9e9c-0c87-467a-be80-34384196dd5&title=&width=1351.2)![image.png](https://cdn.nlark.com/yuque/0/2023/png/36016220/1699511638990-49988854-4196-4a3c-83c6-7a862683c4f8.png#averageHue=%23fdfdfc&clientId=u840c2afd-8358-4&from=paste&height=560&id=u1b3cb573&originHeight=700&originWidth=1687&originalType=binary&ratio=1.25&rotation=0&showTitle=false&size=50726&status=done&style=none&taskId=u4a6c7be9-ad28-474e-812a-8c213651f69&title=&width=1349.6)
+> 到这里没思路了
+
+F12查看源代码<br />![image.png](https://cdn.nlark.com/yuque/0/2023/png/36016220/1699513604806-6d6ddcb9-ae7b-423a-a2cd-eb0b8dea14c0.png#averageHue=%23fcfbfb&clientId=u840c2afd-8358-4&from=paste&height=699&id=resyj&originHeight=874&originWidth=1920&originalType=binary&ratio=1.25&rotation=0&showTitle=false&size=71245&status=done&style=none&taskId=u9d79192c-afbe-4f7c-9784-07bed327748&title=&width=1536)
+> 一定要仔细看啊，差点没找到，笑哭
+
+访问calc.php文件<br />![image.png](https://cdn.nlark.com/yuque/0/2023/png/36016220/1699513904982-2f1101a6-d15d-4232-b2a6-80905375e05f.png#averageHue=%23fdfcfc&clientId=u840c2afd-8358-4&from=paste&height=346&id=u11b066c6&originHeight=432&originWidth=1689&originalType=binary&ratio=1.25&rotation=0&showTitle=false&size=35805&status=done&style=none&taskId=ua046f277-a432-4188-aa9f-b9424c2b154&title=&width=1351.2)
+> 果然有点东西
+
+PHP代码审计
+> error_reporting(0);关闭错误报告
+> 通过GET方式传参的参数num
+> show_source函数将文件内容显示出来
+> 参数num的值赋值给变量str
+> 
+> 创建一个了名为blacklist的数组，该数组包含一系列字符，这些字符被认为是需要从目标字符串中排除的“非法”或“危险”字符。这些字符包括空格、制表符（'\t'）、回车（'\r'）、换行（'\n'）、单引号（'''）、双引号（"）、反引号（`）、左方括号（'['）、右方括号（']'）、美元符号（'$'）、反斜杠（''）和尖括号（'^'）
+> 使用foreach循环遍历blacklist数组中的每一个元素。在每次循环中，当前元素的值会被赋给变量$blackitem。
+> 在每次循环中，使用preg_match函数检查目标字符串$str是否包含当前的黑名单项（即$blackitem）。正则表达式'/' . $blackitem . '/m'用于匹配任何与当前黑名单项相匹配的字符。这里的/m是正则表达式的标记，表示多行模式。在这种模式下，^和$分别匹配每一行的开始和结束，而不仅仅是整个字符串的开始和结束。
+> 如果在目标字符串中找到任何黑名单字符，即preg_match函数返回true，那么程序将立即停止执行，并输出“what are you want to do?”。
+> 最后，这段代码结束foreach循环。
+
+过滤内容：
+> - 空格
+> - 制表符（'\t'）
+> - 回车（'\r'）
+> - 换行（'\n'）
+> - 单引号（'''）
+> - 双引号（"）
+> - 反引号（`）
+> - 左方括号（'['）
+> - 右方括号（']'）
+> - 美元符号（'$'）
+> - 反斜杠（''）
+> - 尖括号（'^'）
+
+**通过给参数num传参（数字和字母）进一步判断**
+> ?num=1
+> ?num=a
+
+正常回显：<br />![image.png](https://cdn.nlark.com/yuque/0/2023/png/36016220/1699516093056-f12e4317-b3dd-4947-b5a1-48cc7ef8d5b0.png#averageHue=%23fbfaf8&clientId=u840c2afd-8358-4&from=paste&height=168&id=u72e5638c&originHeight=210&originWidth=1178&originalType=binary&ratio=1.25&rotation=0&showTitle=false&size=18023&status=done&style=none&taskId=uc65faa8c-9306-4fda-8c30-0c3cd2405f4&title=&width=942.4)<br />回显报错：<br />![image.png](https://cdn.nlark.com/yuque/0/2023/png/36016220/1699516151046-fa86d0fb-6b79-4ef1-a619-03ee325ddb22.png#averageHue=%23f8f7f6&clientId=u840c2afd-8358-4&from=paste&height=249&id=ua4423478&originHeight=311&originWidth=1173&originalType=binary&ratio=1.25&rotation=0&showTitle=false&size=35079&status=done&style=none&taskId=u8f277656-1ae2-464a-b725-433eb8edffe&title=&width=938.4)<br />F12网页源代码是否忽略一些东西？<br />![image.png](https://cdn.nlark.com/yuque/0/2023/png/36016220/1699516231047-6329195d-c719-4ed3-b938-4ecd955cc258.png#averageHue=%23fcfcfc&clientId=u840c2afd-8358-4&from=paste&height=611&id=u7ca0639f&originHeight=764&originWidth=1509&originalType=binary&ratio=1.25&rotation=0&showTitle=false&size=41877&status=done&style=none&taskId=uba306f38-492b-4801-9f13-2b2df4254ae&title=&width=1207.2)
+> 提示存在WAF检测，猜测后台还存在一些过滤
+
+空格绕过WAF检测的原理
+> 一些攻击者可能会尝试利用WAF（Web Application Firewall）的特性，通过在恶意请求中插入特定的字符或字符串来绕过WAF的检测。其中一种常见的方法是使用URL编码或转义字符来绕过WAF。
+> 当攻击者使用空格字符时，WAF通常会将其视为无效字符而将其过滤掉。然而，攻击者可以使用URL编码或转义字符来将空格字符编码为有效的URL编码字符。
+> 例如，使用URL编码，空格可以被编码为"%20"。攻击者可以在恶意请求中使用这个编码后的空格字符来绕过WAF的过滤。
+> 当WAF接收到包含URL编码空格的请求时，它可能会将其解释为有效的URL编码字符，而不是一个空格字符。这样，攻击者就可以在请求中插入有效的URL编码字符，从而绕过WAF的过滤。
+> 需要注意的是，这种方法并不是所有WAF都有效，因为不同的WAF可能会有不同的特性和行为。此外，攻击者还需要了解目标WAF的特性和行为，以便选择合适的方法来绕过其检测。
+
+使用空格绕过WAF检测
+> ?%20num=a
+
+成功绕过WAF检测<br />![image.png](https://cdn.nlark.com/yuque/0/2023/png/36016220/1699516404945-88eac8eb-fb08-478e-8263-27342ca26ee4.png#averageHue=%23f9f8f6&clientId=u840c2afd-8358-4&from=paste&height=127&id=u2025ce79&originHeight=159&originWidth=1161&originalType=binary&ratio=1.25&rotation=0&showTitle=false&size=19158&status=done&style=none&taskId=u260960e0-6b9b-477b-94df-f097129a9c2&title=&width=928.8)<br />查看此题目环境的一些配置信息
+> phpinfo（）是PHP编程语言的内置函数，用来查询PHP相关配置和重要信息等等
+
+`?%20num=phpinfo()`<br />![image.png](https://cdn.nlark.com/yuque/0/2023/png/36016220/1699516685494-6938582a-5e59-4a91-9b8b-7246f5d595c9.png#averageHue=%23cead79&clientId=u840c2afd-8358-4&from=paste&height=827&id=u05d68b41&originHeight=1034&originWidth=1912&originalType=binary&ratio=1.25&rotation=0&showTitle=false&size=128599&status=done&style=none&taskId=uf5a6eb9a-311c-4f32-8747-2ab8f193e23&title=&width=1529.6)
+> **disable_functions是PHP内置的一个设置选项，类似于黑名单，用来禁用危险函数、命令、关键字等等，用来提高网站和WAF的安全性**
+> **从红框那里可以看到过滤了很多命令执行函数，比如：**passthru、exec、system等等
+
+**从这里看的话命令执行是行不通了，既然phpinfo()可以打通，那咱们就用PHP内置输出函数来获取flag值**
+> PHP的输出函数有：
+> 1. echo()可输出字符串
+> 2. print()、print_r()、printf()、sprintf()、var_dump()可输出变量的内容、类型或字符串的内容、类型、长度等
+> 3. die()输出内容并退出程序
+
+> **经过测试只有print_r()函数和var_dump()函数可以输出内容**
+
+靠这些还远远不够
+> 还需要用到两个函数和一个方法
+> scandir() 函数返回指定目录中的文件和目录的数组，类似于Linux里面的“ls”命令。
+> file_get_contents() 函数把整个文件读入一个字符串中。
+> 字符串转ASCII码chr()对应表
+
+为什么PHP可以识别ASCII码chr()对应表？
+> PHP可以识别ASCII码chr()对应表，是因为PHP是一种通用的服务器端脚本语言，它可以处理文本数据。ASCII码是一种7位无符号整数编码系统，它使用数字0-127来表示所有的字符、数字和标点符号等。在PHP中，chr()函数可以将ASCII码转换为相应的字符。因此，在编写PHP程序时，我们可以使用chr()函数将ASCII码转换为相应的字符，以便在程序中使用它们。
+
+> ![d8b2579559316ac65a2e974f2352c33d_d18bd8a7c51c409ca6c5b42d64f96ae8.png](https://cdn.nlark.com/yuque/0/2023/png/36016220/1699534212018-61e0b785-ab8b-44c3-abb7-290aa8c3ea82.png#averageHue=%23f8f7f6&clientId=u756c5220-1418-4&from=paste&height=645&id=uc81f77a1&originHeight=806&originWidth=904&originalType=binary&ratio=1.25&rotation=0&showTitle=false&size=90088&status=done&style=none&taskId=u4289b363-b8d2-4891-9907-4934c80daaa&title=&width=723.2)
+> 更详细内容可以参考我这篇文章[https://blog.csdn.net/m0_73734159/article/details/133854073?spm=1001.2014.3001.5502](https://blog.csdn.net/m0_73734159/article/details/133854073?spm=1001.2014.3001.5502)
+
+**查看根目录下的所有文件**（print_r和var_dump两种方法对比参考）<br />`?%20num=print_r(scandir(chr(47)))`<br />![image.png](https://cdn.nlark.com/yuque/0/2023/png/36016220/1699534449334-79f12863-1280-4d50-8883-0ccb6a6e77db.png#averageHue=%23f7f5f4&clientId=u756c5220-1418-4&from=paste&height=165&id=u44f8ad84&originHeight=206&originWidth=1920&originalType=binary&ratio=1.25&rotation=0&showTitle=false&size=43279&status=done&style=none&taskId=u4050a07a-2bbd-4206-a45c-271eba5bf94&title=&width=1536)<br />`?%20num=var_dump(scandir(chr(47)))`<br />![image.png](https://cdn.nlark.com/yuque/0/2023/png/36016220/1699534580545-df7f442f-2d3d-4f7a-964a-f4e56a913db9.png#averageHue=%23f4f2ef&clientId=u756c5220-1418-4&from=paste&height=168&id=u5574a5c3&originHeight=210&originWidth=1919&originalType=binary&ratio=1.25&rotation=0&showTitle=false&size=53922&status=done&style=none&taskId=u8453f269-2cb0-40c0-aa57-a3548f09871&title=&width=1535.2)<br />发现f1agg文件<br />探测f1agg文件内容
+> 根目录下的f1agg文件对应ASCII码chr()对应表依次是
+> - / => chr(47)
+> - f => chr(102)
+> - 1=> chr(49)
+> - a => chr(97)
+> - g => chr(103)
+> - g => chr(103)
+> 
+使用连接符"."进行连接：
+> **/f1agg => chr(47).chr(102).chr(49).chr(97).chr(103).chr(103)**
+
+`?%20num=print_r(file_get_contents(chr(47).chr(102).chr(49).chr(97).chr(103).chr(103)))`<br />![image.png](https://cdn.nlark.com/yuque/0/2023/png/36016220/1699535186713-1e017cf2-065b-43ff-913f-e4c4b4c5e943.png#averageHue=%23f7f5f3&clientId=u756c5220-1418-4&from=paste&height=123&id=u1820409e&originHeight=154&originWidth=1297&originalType=binary&ratio=1.25&rotation=0&showTitle=false&size=28339&status=done&style=none&taskId=u242292ef-fbc2-4ca8-bb6e-222da5e202a&title=&width=1037.6)<br />`?%20num=var_dump(file_get_contents(chr(47).chr(102).chr(49).chr(97).chr(103).chr(103)))`<br />![image.png](https://cdn.nlark.com/yuque/0/2023/png/36016220/1699535300512-1d89ce38-ac44-4fff-ac11-c908ae7164c3.png#averageHue=%23f6f5f2&clientId=u756c5220-1418-4&from=paste&height=124&id=ue6a8f115&originHeight=155&originWidth=1305&originalType=binary&ratio=1.25&rotation=0&showTitle=false&size=30119&status=done&style=none&taskId=u223b673c-5cc4-4662-b84b-8a24b9278b0&title=&width=1044)
+> 这两个函数不同回显结果，大同小异，大家可以对比进行深入了解这两个打印函数
+
+**得到flag：**<br />`flag{fc4b0414-1e6c-4391-89d8-c5f1dfe3e0dd}`
+
+原文链接：https://blog.csdn.net/m0_73734159/article/details/134320845?csdn_share_tail=%7B%22type%22%3A%22blog%22%2C%22rType%22%3A%22article%22%2C%22rId%22%3A%22134320845%22%2C%22source%22%3A%22m0_73734159%22%7D
+
+
 
 
 
