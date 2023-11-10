@@ -652,6 +652,109 @@ PHP代码审计
 
 原文链接：https://blog.csdn.net/m0_73734159/article/details/134320845?csdn_share_tail=%7B%22type%22%3A%22blog%22%2C%22rType%22%3A%22article%22%2C%22rId%22%3A%22134320845%22%2C%22source%22%3A%22m0_73734159%22%7D
 
+## [极客大挑战 2019]BuyFlag 1（两种解法）
+
+题目环境：<br />![image.png](https://cdn.nlark.com/yuque/0/2023/png/36016220/1699597414771-452cdb2a-2f1e-40eb-82f1-ca59b3021ff6.png#averageHue=%235a514c&clientId=u8fd9cbd0-eea1-4&from=paste&height=820&id=uf315cfe3&originHeight=1025&originWidth=1920&originalType=binary&ratio=1.25&rotation=0&showTitle=false&size=554895&status=done&style=none&taskId=u9398f363-dafe-496d-a015-80086cc63c5&title=&width=1536)<br />![image.png](https://cdn.nlark.com/yuque/0/2023/png/36016220/1699597441699-f77a2b8a-8b6c-48f4-b8c0-2ccfffc43864.png#averageHue=%2332595a&clientId=u8fd9cbd0-eea1-4&from=paste&height=832&id=u0a650fa1&originHeight=1040&originWidth=1920&originalType=binary&ratio=1.25&rotation=0&showTitle=false&size=300087&status=done&style=none&taskId=u33c02a30-b003-4d90-938e-11dfd44e221&title=&width=1536)<br />![image.png](https://cdn.nlark.com/yuque/0/2023/png/36016220/1699597504117-ef9f9592-95e7-4e03-b0b1-458d659dda1e.png#averageHue=%23a09b98&clientId=u8fd9cbd0-eea1-4&from=paste&height=824&id=u7d708a96&originHeight=1030&originWidth=1913&originalType=binary&ratio=1.25&rotation=0&showTitle=false&size=382262&status=done&style=none&taskId=ud1da827b-a7db-4ac2-854b-85a907c94f0&title=&width=1530.4)
+> FLAG NEED YOUR 100000000 MONEY
+> flag需要你的100000000元
+
+F12瞅瞅源代码：<br />![image.png](https://cdn.nlark.com/yuque/0/2023/png/36016220/1699598067024-8a802599-5ee5-4634-aca6-f5899b917fc2.png#averageHue=%23fcfcfc&clientId=u8fd9cbd0-eea1-4&from=paste&height=760&id=u2960e55e&originHeight=950&originWidth=1911&originalType=binary&ratio=1.25&rotation=0&showTitle=false&size=53108&status=done&style=none&taskId=u102732d5-3ffd-4b7d-8202-978ef0133b0&title=&width=1528.8)
+```php
+if (isset($_POST['password']))
+ {   
+$password = $_POST['password'];   
+if (is_numeric($password)) 
+{   
+echo "password can't be number"
+}
+elseif ($password == 404)
+ {  
+ echo "Password Right!
+  		} 
+ 	 } 
+```
+PHP代码审计：
+> 两个通过POST方式传参的参数password和money
+> isset函数判断参数是否存在以及值是否为空，存在及不为空则返回TRUE
+> **is_numeric()** 函数用于检测变量是否为数字或数字字符串；这里需要注意数字字符串的意思就是字面意思通过数字组成的字符串，比如："123456789"
+> 如果是数字或者是数字字符串就会输出"password can't be number"
+> 如果password是404则密码就是正确的
+
+> 当password是404的时候虽然满足了第二个elseif语句但是不满足第一个if语句
+> 因为404是数字和数字字符串
+> **想要满足第一个简单，让password成为普通字符串就可以，404a、404b、404c、404%10、404,%20、404%30等等**
+> 这样第二个条件也顺便满足了，为什么呢？（在比较的时候把值转换成了数字字符串）
+> "=="是PHP弱比较逻辑运算符
+
+PHP弱比较：
+> PHP中的弱比较（Weak comparison）是一种比较两个值是否相等的方法，但它不会对两个值进行严格的全等比较。相反，它允许某些类型的值在比较时进行自动类型转换。
+> 弱比较使用以下规则：
+> 1. 如果两个值都是布尔值，则它们被认为是相等的，只要它们都是 true 或 false。
+> 2. 如果两个值都是整数或浮点数，则它们被认为是相等的，只要它们的值相等。
+> 3. 如果两个值都是字符串，则它们被认为是相等的，只要它们的长度和字符序列相同。
+> 4. 如果两个值是数组或对象，则它们被认为是相等的，只要它们具有相同的结构（键和值）和相同的顺序。
+> 5. 如果两个值是 null，则它们被认为是相等的。
+> 6. 对于其他类型的值，弱比较使用 PHP 的 == 操作符进行比较。
+
+传参并使用burpsuite进行抓包<br />`password=404a&money=100000000`<br />![image.png](https://cdn.nlark.com/yuque/0/2023/png/36016220/1699606908777-af4759a6-d14d-4e2c-8c25-dd7b4b963057.png#averageHue=%234b3b33&clientId=u1342fd3d-7d5a-4&from=paste&height=731&id=u2896d0ba&originHeight=914&originWidth=1920&originalType=binary&ratio=1.25&rotation=0&showTitle=false&size=305359&status=done&style=none&taskId=u14a8bb9a-6bf4-426f-85c8-e52af54211b&title=&width=1536)
+> 先通过火狐浏览器插件Max HackBar进行POST传参，再抓包，这样数据包就是POST传参方式，如果直接在数据包里面把GET方式传参改为POST方式传参的话，可能依旧是GET方式传参，这点需要注意。
+
+![image.png](https://cdn.nlark.com/yuque/0/2023/png/36016220/1699607168603-c5fa81eb-1b39-4c8a-8920-888a05f5da93.png#averageHue=%23f9f9f9&clientId=u1342fd3d-7d5a-4&from=paste&height=727&id=u36533020&originHeight=909&originWidth=1714&originalType=binary&ratio=1.25&rotation=0&showTitle=false&size=122379&status=done&style=none&taskId=u8347872b-e50f-442e-bc37-37c0d3a7795&title=&width=1371.2)<br />鼠标右键Repeater->Send进行重放<br />![image.png](https://cdn.nlark.com/yuque/0/2023/png/36016220/1699607236909-e9f279c3-debe-4303-8141-1a54d35a672c.png#averageHue=%23f8f8f8&clientId=u1342fd3d-7d5a-4&from=paste&height=699&id=ud053f619&originHeight=874&originWidth=1721&originalType=binary&ratio=1.25&rotation=0&showTitle=false&size=157814&status=done&style=none&taskId=ua8e47708-a151-41c5-b32a-a0801cc770a&title=&width=1376.8)<br />![image.png](https://cdn.nlark.com/yuque/0/2023/png/36016220/1699607310533-42d3031e-7fd0-4333-824e-0c7f727ad691.png#averageHue=%23f9f8f8&clientId=u1342fd3d-7d5a-4&from=paste&height=695&id=u6516de82&originHeight=869&originWidth=1714&originalType=binary&ratio=1.25&rotation=0&showTitle=false&size=167492&status=done&style=none&taskId=u90dd96b0-21b1-436d-8db1-239098a0b01&title=&width=1371.2)
+> 仅学生用户可以购买FLAG
+> 注意Cookie:user=0
+> user是用户，0通常代表flase(错误),1通常代表true(正确)
+> 咱们将user修改为1使后台程序可以正常运行
+
+修改user=1<br />继续Send进行重放<br />![image.png](https://cdn.nlark.com/yuque/0/2023/png/36016220/1699607670753-c9ee492e-eee9-4e51-84b0-1c4ce3b0c02e.png#averageHue=%23f9f8f8&clientId=u1342fd3d-7d5a-4&from=paste&height=694&id=u607971ee&originHeight=868&originWidth=1714&originalType=binary&ratio=1.25&rotation=0&showTitle=false&size=167416&status=done&style=none&taskId=uec94cac0-d759-4761-92b9-852ca1c75ea&title=&width=1371.2)
+> 用户和密码都绕过了
+> Nember lenth is too long
+> 你的数字太长了
+> 到这里想到了**使用科学计数法绕过**
+> 1e9代表1的后面有9个0 => 1000000000 > 100000000 (要大于题目要求的money值！）
+> 既满足了条件，数字长度也不长
+
+使用科学计数法绕过money：<br />`password=404a&money=1e9`<br />![image.png](https://cdn.nlark.com/yuque/0/2023/png/36016220/1699608061333-f16a2fa0-0455-48ab-8dd0-cf81e963cc4b.png#averageHue=%23f8f8f8&clientId=u1342fd3d-7d5a-4&from=paste&height=694&id=u1ba89bfc&originHeight=868&originWidth=1714&originalType=binary&ratio=1.25&rotation=0&showTitle=false&size=170347&status=done&style=none&taskId=uc00305a8-51a2-4db8-bc0f-ddd14763abd&title=&width=1371.2)<br />当money=1时<br />![image.png](https://cdn.nlark.com/yuque/0/2023/png/36016220/1699608241262-f4f49cd0-d0a1-41c9-acff-22e69e6fbab0.png#averageHue=%23f9f8f8&clientId=u1342fd3d-7d5a-4&from=paste&height=724&id=u82b8fdac&originHeight=905&originWidth=1714&originalType=binary&ratio=1.25&rotation=0&showTitle=false&size=179303&status=done&style=none&taskId=u0f68f33a-992d-4e11-8e34-ecd1af6058f&title=&width=1371.2)
+> you have not enough money,loser
+> 你没有足够的钱
+
+经过给money参数分情况测试，有3种输出结果
+> - 当 money => 100000000
+>    - 输出"Nember lenth is too long"
+> - 当 money < 100000000
+>    - 输出"you have not enough money,loser"
+> - 当 1e9 <= money <= 1e999999（说着当money变为数组时）
+>    - 输出"flag值"
+> 
+猜测用到了函数strcmp()用来比较两个字符串，同时还可以比较两个字符串的字符数
+> strcmp(_string1,string2_)
+> - 0 - 如果两个字符串相等
+> - <0 - 如果 string1 小于 string2
+> - >0 - 如果 string1 大于 string2
+> 
+**所以当过滤不当不全时，可以通过将参数变为数组的方式进行绕过，这样的话就无法比较，直接返回true**
+
+这里大胆猜测他的后台源码：
+```php
+<?php
+$flag=100000000;
+$Flag='flag{0c531ed2-9c1e-479a-adcb-d975b1376ca6}'
+if (isset($_POST['money'])) {       
+	if (strcmp($_POST['money'],$flag) == 0)#比较money和flag的值和字符数，"=="PHP弱比较逻辑运算符           
+		echo $Flag;       
+  elseif(strcmp($_POST['money'],$flag) < 0)           
+		print 'you have not enough money,loser';
+  else
+    print 'Nember lenth is too long';
+}
+?>
+```
+通过数组绕过money：<br />`password=404a&mony[]=0`<br />![image.png](https://cdn.nlark.com/yuque/0/2023/png/36016220/1699613098401-7a2b1c41-2eda-4743-9ab8-bd405d91c186.png#averageHue=%23f7f7f7&clientId=u1342fd3d-7d5a-4&from=paste&height=818&id=ub55e708e&originHeight=1022&originWidth=1916&originalType=binary&ratio=1.25&rotation=0&showTitle=false&size=161668&status=done&style=none&taskId=u7000ced0-091d-4516-adc9-b9f62c9fcd6&title=&width=1532.8)
+> 中途我2023版Burp里面的Repeater消失不见了，这里问下师傅们，现在不知道怎么回事，所以我又用2021版本Kali做题了，苦涩
+
+**得到flag：**<br />`flag{cb3acdc3-dcda-49d0-9597-b7247f9c6ff0}`
+
+原文链接：https://blog.csdn.net/m0_73734159/article/details/134339328?csdn_share_tail=%7B%22type%22%3A%22blog%22%2C%22rType%22%3A%22article%22%2C%22rId%22%3A%22134339328%22%2C%22source%22%3A%22m0_73734159%22%7D
+
 
 
 
