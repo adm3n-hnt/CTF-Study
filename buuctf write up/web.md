@@ -755,7 +755,51 @@ if (isset($_POST['money'])) {
 
 原文链接：https://blog.csdn.net/m0_73734159/article/details/134339328?csdn_share_tail=%7B%22type%22%3A%22blog%22%2C%22rType%22%3A%22article%22%2C%22rId%22%3A%22134339328%22%2C%22source%22%3A%22m0_73734159%22%7D
 
+## [BJDCTF2020]Easy MD5 1
 
+题目环境：<br />![image.png](https://cdn.nlark.com/yuque/0/2023/png/36016220/1699683330948-a1c8726b-c02d-4a8a-9bae-be0fd6b6c565.png#averageHue=%23fdfdfd&clientId=u21854629-628d-4&from=paste&height=814&id=u1fdc9a1f&originHeight=1017&originWidth=1914&originalType=binary&ratio=1.25&rotation=0&showTitle=false&size=48536&status=done&style=none&taskId=u75537810-7506-4bce-b557-d6a2543d6a7&title=&width=1531.2)
+> 尝试了SQL注入、命令执行等都不行
+
+点击提交并burp进行抓包<br />![image.png](https://cdn.nlark.com/yuque/0/2023/png/36016220/1699685130127-5bb65d1b-a2d5-49d2-9650-978ac70ee830.png#averageHue=%23f9f9f9&clientId=u21854629-628d-4&from=paste&height=734&id=ua300e7e1&originHeight=918&originWidth=1706&originalType=binary&ratio=1.25&rotation=0&showTitle=false&size=145165&status=done&style=none&taskId=u9e05a461-bdb1-4abc-a128-33e23501b58&title=&width=1364.8)<br />Repeater进行重放<br />![image.png](https://cdn.nlark.com/yuque/0/2023/png/36016220/1699685215046-e97a4fb1-d71d-4e64-9e66-79dbd61d4a17.png#averageHue=%23f9f8f8&clientId=u21854629-628d-4&from=paste&height=746&id=u42dbd81f&originHeight=932&originWidth=1722&originalType=binary&ratio=1.25&rotation=0&showTitle=false&size=190230&status=done&style=none&taskId=u10258830-ac8f-46d5-8752-f025584489e&title=&width=1377.6)<br />这里看到了内置的SQL语句<br />`select * from 'admin' where password=md5($pass,true)`
+> 发现传进去的值会进行md5加密
+
+这里看了大佬们的解释
+> ffifdyop绕过，绕过原理是：<br />ffifdyop 这个字符串被 [md5](https://so.csdn.net/so/search?q=md5&spm=1001.2101.3001.7020) 哈希了之后会变成 276f722736c95d99e921722cf9ed621c，这个字符串前几位刚好是' or '6<br />而 Mysql 刚好又会把 hex 转成 ascii 解释，因此拼接之后的形式是select * from 'admin' where password='' or '6xxxxx'，等价于 or 一个永真式，因此相当于万能密码，可以绕过md5()函数。
+
+> 所以说看到这段内置SQL语句，直接使用ffifdyop绕过即可，这就是它的原理
+
+使用ffifdyop进行绕过<br />![image.png](https://cdn.nlark.com/yuque/0/2023/png/36016220/1699686126236-b3748616-17e0-4419-b1d7-3f1599447d87.png#averageHue=%23fdfdfc&clientId=u21854629-628d-4&from=paste&height=569&id=u7ed9ac3f&originHeight=711&originWidth=1918&originalType=binary&ratio=1.25&rotation=0&showTitle=false&size=50461&status=done&style=none&taskId=u574610b2-7051-4236-9584-59e1ef13a27&title=&width=1534.4)<br />![image.png](https://cdn.nlark.com/yuque/0/2023/png/36016220/1699686149776-906eaa77-2c60-43e6-b974-e0baa65a95b4.png#averageHue=%23fbfbfb&clientId=u21854629-628d-4&from=paste&height=642&id=u158e5e91&originHeight=803&originWidth=1907&originalType=binary&ratio=1.25&rotation=0&showTitle=false&size=47517&status=done&style=none&taskId=ucebb6508-9e81-43d2-b321-0e53f061e22&title=&width=1525.6)<br />F12查看源代码<br />![image.png](https://cdn.nlark.com/yuque/0/2023/png/36016220/1699686202171-32cf90b2-a8fd-428b-9060-db03ba6af014.png#averageHue=%23fdfdfd&clientId=u21854629-628d-4&from=paste&height=760&id=u6adff580&originHeight=950&originWidth=1911&originalType=binary&ratio=1.25&rotation=0&showTitle=false&size=31575&status=done&style=none&taskId=u6417d4b1-c8e4-4e5c-981a-b2167314a08&title=&width=1528.8)
+```php
+ <!--  
+$a = $GET['a'];  
+$b = $_GET['b'];   
+ if($a != $b && md5($a) == md5($b))
+{  
+// wow, glzjin wants a girl friend.  
+--> 
+```
+MD5弱比较通过数组绕过原理：
+> MD5数组绕过原理是利用了PHP中数组作为参数传递时的hash计算漏洞。在PHP中，数组作为参数传递时会被hash计算，但是MD5函数只能接受字符串类型的参数，因此当数组作为参数传递时，会提示MD5()函数需要一个string类型的参数。为了绕过这个限制，可以通过将数组转化为字符串类型后再进行MD5运算，从而实现绕过绕过限制的目的。
+
+GET方式进行传参：<br />`a[]=1&b[]=2`<br />![image.png](https://cdn.nlark.com/yuque/0/2023/png/36016220/1699686626028-53d519b0-bf54-4258-b0ea-78d00018e371.png#averageHue=%23fbfbfb&clientId=u21854629-628d-4&from=paste&height=578&id=u8d3f7b5d&originHeight=723&originWidth=1920&originalType=binary&ratio=1.25&rotation=0&showTitle=false&size=54077&status=done&style=none&taskId=u610a5551-fc94-4c16-8124-ed77abeead6&title=&width=1536)<br />回车：<br />![image.png](https://cdn.nlark.com/yuque/0/2023/png/36016220/1699686692201-4c9d3b22-e3b5-4e74-a8da-daefc95a75d4.png#averageHue=%23fcfbfa&clientId=u21854629-628d-4&from=paste&height=238&id=u8e9590c2&originHeight=298&originWidth=1920&originalType=binary&ratio=1.25&rotation=0&showTitle=false&size=31657&status=done&style=none&taskId=u72503321-337e-45b7-aa32-480c2528d9e&title=&width=1536)
+```php
+<?php
+error_reporting(0);
+include "flag.php";
+
+highlight_file(__FILE__);
+
+if($_POST['param1']!==$_POST['param2']&&md5($_POST['param1'])===md5($_POST['param2'])){
+echo $flag;
+}
+```
+> 通过POST方式进行传参
+> 弱比较通过数组绕过第一个
+> MD5强比较仍然可以使用数组进行绕过
+
+POST进行传参：<br />`param1[]=1&param2[]=2`<br />![image.png](https://cdn.nlark.com/yuque/0/2023/png/36016220/1699687231154-356143eb-1fe9-4333-a5c7-bbb07161ff14.png#averageHue=%23fcfcfc&clientId=u21854629-628d-4&from=paste&height=864&id=u6a813136&originHeight=1080&originWidth=1917&originalType=binary&ratio=1.25&rotation=0&showTitle=false&size=105582&status=done&style=none&taskId=u04e50e4e-42a2-46be-b3b5-d38ddd3efdc&title=&width=1533.6)<br />**得到flag：**<br />`flag{107355e0-5214-4977-b55f-650e264f2074}`
+
+原文链接：https://blog.csdn.net/m0_73734159/article/details/134349129?spm=1001.2014.3001.5501
 
 
 
