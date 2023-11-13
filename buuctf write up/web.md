@@ -843,6 +843,45 @@ print(filehash)#输出加密后的md532位小写的值
 
 原文链接：https://blog.csdn.net/m0_73734159/article/details/134360691?csdn_share_tail=%7B%22type%22%3A%22blog%22%2C%22rType%22%3A%22article%22%2C%22rId%22%3A%22134360691%22%2C%22source%22%3A%22m0_73734159%22%7D
 
+## [HCTF 2018]admin 1（四种解法！）
+
+题目环境：<br />![image.png](https://cdn.nlark.com/yuque/0/2023/png/36016220/1699839520313-e2639d27-db24-4168-936a-8ada7716a3c0.png#averageHue=%23fcfcfc&clientId=u171565c0-1b4a-4&from=paste&height=374&id=u71989777&originHeight=468&originWidth=1920&originalType=binary&ratio=1.25&rotation=0&showTitle=false&size=49398&status=done&style=none&taskId=u4a33f077-16f6-4ff9-8ae7-6d1588b4488&title=&width=1536)
+> 有登录和注册两个按钮
+> 先注册一个admin用户
+
+注册admin用户<br />![image.png](https://cdn.nlark.com/yuque/0/2023/png/36016220/1699839626612-bf7ccd3f-5d3e-4afc-bd65-a0e956e1855b.png#averageHue=%23fefefe&clientId=u171565c0-1b4a-4&from=paste&height=528&id=ufb3e363a&originHeight=660&originWidth=1035&originalType=binary&ratio=1.25&rotation=0&showTitle=false&size=33187&status=done&style=none&taskId=ue6156d76-8eac-442e-b860-4c3f3b4391f&title=&width=828)
+> 显示admin用户已经被注册了
+> 好，这就简单了，admin用户存在，但是不清楚admin用户的密码
+> 尝试以下弱口令
+
+**第一种解法：密码爆破-尝试弱口令**
+> 进去login登陆界面
+> admin
+> 123
+
+![image.png](https://cdn.nlark.com/yuque/0/2023/png/36016220/1699839995637-871e3bdd-9786-44e3-84c0-a10783e8969d.png#averageHue=%23fdfdfc&clientId=u171565c0-1b4a-4&from=paste&height=478&id=ue4d5355c&originHeight=597&originWidth=1920&originalType=binary&ratio=1.25&rotation=0&showTitle=false&size=51857&status=done&style=none&taskId=u3a0d16e9-2b30-461b-8ade-37a5264e6e8&title=&width=1536)<br />![image.png](https://cdn.nlark.com/yuque/0/2023/png/36016220/1699840026226-7fdbb8a2-2bb5-4b86-9640-ed29ae91a81f.png#averageHue=%23fcfcfb&clientId=u171565c0-1b4a-4&from=paste&height=393&id=u0c3e4dae&originHeight=491&originWidth=1913&originalType=binary&ratio=1.25&rotation=0&showTitle=false&size=57873&status=done&style=none&taskId=u3ca475ef-742b-4544-9de4-95dbc8ded44&title=&width=1530.4)
+> 啊，夺少？这就成功了？
+
+**得到flag：**<br />`flag{73e15dda-e724-402f-a8df-b80bb22a4060}`<br />**第一种解法：密码爆破-burpsuite-字典**
+> 不过话说回来，还是不应该投机取巧，咱们按照正常步骤走一遍
+
+输入admin用户-密码任意比如说1-登录-并使用burp进行抓包<br />![image.png](https://cdn.nlark.com/yuque/0/2023/png/36016220/1699840848841-6b0a5e57-b736-4e70-b4df-f6f9f23b263c.png#averageHue=%23fbfaf9&clientId=u171565c0-1b4a-4&from=paste&height=736&id=u95fc5087&originHeight=920&originWidth=1718&originalType=binary&ratio=1.25&rotation=0&showTitle=false&size=114448&status=done&style=none&taskId=u0d68c9ac-0202-4ec3-a3a7-f52d477f9b7&title=&width=1374.4)
+
+Intruder送去爆破<br />![image.png](https://cdn.nlark.com/yuque/0/2023/png/36016220/1699840915125-fb4efc66-56f1-4acf-85bb-0e33d5be776c.png#averageHue=%23f8f7f7&clientId=u171565c0-1b4a-4&from=paste&height=750&id=u43c89d5d&originHeight=938&originWidth=1718&originalType=binary&ratio=1.25&rotation=0&showTitle=false&size=193012&status=done&style=none&taskId=u067c872a-aeda-45dd-be06-6b6fb16ba00&title=&width=1374.4)<br />选择爆破对象<br />![image.png](https://cdn.nlark.com/yuque/0/2023/png/36016220/1699841010841-daa74c93-b77b-4ddf-b509-19845fbc18d9.png#averageHue=%23f8f7f7&clientId=u171565c0-1b4a-4&from=paste&height=743&id=u3988a0a4&originHeight=929&originWidth=1718&originalType=binary&ratio=1.25&rotation=0&showTitle=false&size=152846&status=done&style=none&taskId=u1a90856f-f4ad-42a8-b709-fc5c832434e&title=&width=1374.4)
+> 光标选中1，Add添加即可
+
+选择字典进行爆破<br />![image.png](https://cdn.nlark.com/yuque/0/2023/png/36016220/1699841110807-212dba9b-21af-406a-b55f-c180e6945394.png#averageHue=%23f7f7f7&clientId=u171565c0-1b4a-4&from=paste&height=726&id=u846034c1&originHeight=908&originWidth=1718&originalType=binary&ratio=1.25&rotation=0&showTitle=false&size=101602&status=done&style=none&taskId=udcbcf13a-151d-4621-813d-d62f9b62f7a&title=&width=1374.4)<br />Start attack开始爆破<br />![image.png](https://cdn.nlark.com/yuque/0/2023/png/36016220/1699841199116-008d57ad-0484-46e0-abb1-25541383f299.png#averageHue=%23f7f7f7&clientId=u171565c0-1b4a-4&from=paste&height=726&id=ucc672cf8&originHeight=908&originWidth=1718&originalType=binary&ratio=1.25&rotation=0&showTitle=false&size=96379&status=done&style=none&taskId=ud4e64d52-7dfe-4190-96ac-27da90a16b1&title=&width=1374.4)<br />![image.png](https://cdn.nlark.com/yuque/0/2023/png/36016220/1699841358426-674b9ccb-4076-4e76-ac03-0c4bc8c131a8.png#averageHue=%23f6f6f6&clientId=u171565c0-1b4a-4&from=paste&height=721&id=u52aa96c3&originHeight=901&originWidth=1718&originalType=binary&ratio=1.25&rotation=0&showTitle=false&size=110045&status=done&style=none&taskId=ufca5efaf-4f12-42c4-a685-19afb4d0d27&title=&width=1374.4)<br />![image.png](https://cdn.nlark.com/yuque/0/2023/png/36016220/1699841520212-3624331f-2a30-4042-854c-66d936ec17b0.png#averageHue=%23fbfbfa&clientId=u171565c0-1b4a-4&from=paste&height=740&id=uda3ca86e&originHeight=925&originWidth=1718&originalType=binary&ratio=1.25&rotation=0&showTitle=false&size=116007&status=done&style=none&taskId=u3d4d56ff-885b-40a7-8159-4a8a43cb827&title=&width=1374.4)
+> 得到admin用户的密码
+> 密码为123
+
+登录admin用户<br />![image.png](https://cdn.nlark.com/yuque/0/2023/png/36016220/1699841581913-b24788df-71ec-4456-9300-51f53b5765b8.png#averageHue=%23fdfdfc&clientId=u171565c0-1b4a-4&from=paste&height=479&id=u163b83c1&originHeight=599&originWidth=1916&originalType=binary&ratio=1.25&rotation=0&showTitle=false&size=56284&status=done&style=none&taskId=ubf992c73-d116-4527-8fed-8bf953c1ebb&title=&width=1532.8)<br />![image.png](https://cdn.nlark.com/yuque/0/2023/png/36016220/1699841633432-7ad2f0a9-e2f4-445f-b65f-00581d73b719.png#averageHue=%23fcfcfb&clientId=u171565c0-1b4a-4&from=paste&height=382&id=u2b7d28f0&originHeight=478&originWidth=1920&originalType=binary&ratio=1.25&rotation=0&showTitle=false&size=60904&status=done&style=none&taskId=u55d931a6-8840-4492-8216-23972af047b&title=&width=1536)<br />**得到flag：**<br />`flag{73e15dda-e724-402f-a8df-b80bb22a4060}`
+> **第二种解法：flask session 伪造**
+> **第三种解法：Unicode欺骗**
+> **第四种解法：条件竞争**
+> **这三种解法大家可以看这位师傅写的文章，非常详细**[**https://blog.csdn.net/qq_46918279/article/details/121294915**](https://blog.csdn.net/qq_46918279/article/details/121294915)
+
+原文链接：https://blog.csdn.net/m0_73734159/article/details/134372214?csdn_share_tail=%7B%22type%22%3A%22blog%22%2C%22rType%22%3A%22article%22%2C%22rId%22%3A%22134372214%22%2C%22source%22%3A%22m0_73734159%22%7D
+
 
 
 
