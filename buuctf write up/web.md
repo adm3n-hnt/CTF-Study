@@ -882,6 +882,59 @@ Intruder送去爆破<br />![image.png](https://cdn.nlark.com/yuque/0/2023/png/36
 
 原文链接：https://blog.csdn.net/m0_73734159/article/details/134372214?csdn_share_tail=%7B%22type%22%3A%22blog%22%2C%22rType%22%3A%22article%22%2C%22rId%22%3A%22134372214%22%2C%22source%22%3A%22m0_73734159%22%7D
 
+## （.htaccess文件特性）[MRCTF2020]你传你🐎呢 1
+
+题目环境：<br />![image.png](https://cdn.nlark.com/yuque/0/2023/png/36016220/1699870319843-43da1adb-b9c1-454f-8e6e-d10b8bcb1c43.png#averageHue=%23d8d7d3&clientId=uc4f9745e-3876-4&from=paste&height=551&id=udf4f585a&originHeight=689&originWidth=1920&originalType=binary&ratio=1.25&rotation=0&showTitle=false&size=638791&status=done&style=none&taskId=u8a006a75-9a1e-4290-be1a-78d68009f68&title=&width=1536)
+> 不难看出是一道文件上传漏洞
+
+上传一句话木马文件<br />burpsuite进行抓包<br />`<?php @eval($_POST['shell']);?>`
+> 命名为PHP文件格式
+
+![image.png](https://cdn.nlark.com/yuque/0/2023/png/36016220/1699943172301-640ca741-31b4-4a7b-848a-5e83d350bbfc.png#averageHue=%23e8e6e3&clientId=u3b3bf35b-d4c8-4&from=paste&height=750&id=u9d0419e7&originHeight=938&originWidth=1718&originalType=binary&ratio=1.25&rotation=0&showTitle=false&size=534640&status=done&style=none&taskId=ufd300600-74c4-4bbb-a0a3-d47a322e88a&title=&width=1374.4)<br />Repeater进行重放<br />![image.png](https://cdn.nlark.com/yuque/0/2023/png/36016220/1699943256871-969346a7-32f6-47b7-906e-694be3ec2092.png#averageHue=%23f8f7f7&clientId=u3b3bf35b-d4c8-4&from=paste&height=750&id=u917b1853&originHeight=938&originWidth=1718&originalType=binary&ratio=1.25&rotation=0&showTitle=false&size=182306&status=done&style=none&taskId=ua873d315-fa5d-4d62-bbd6-545db6898bf&title=&width=1374.4)<br />![image.png](https://cdn.nlark.com/yuque/0/2023/png/36016220/1699943290724-e46fcbe4-40fa-4a7b-9f1a-3eec2c429b1e.png#averageHue=%23f8f8f8&clientId=u3b3bf35b-d4c8-4&from=paste&height=730&id=uedef10ca&originHeight=912&originWidth=1718&originalType=binary&ratio=1.25&rotation=0&showTitle=false&size=169621&status=done&style=none&taskId=u5891db10-4dbf-4318-8487-197821eb73d&title=&width=1374.4)
+> 尝试了其它后缀进行绕过都没有成功
+> 通过 application/x-php内容类型，可以看出被识别出是PHP文件，猜测作者使用了htaccess文件更改了相关配置
+
+了解.htaccess文件
+> 概述来说，htaccess文件是Apache服务器中的一个配置文件，它负责相关目录下的网页配置。通过htaccess文件，可以帮我们实现:网页[301重定向](https://baike.so.com/doc/5328820-5563992.html)、自定义404错误页面、**改变文件扩展名**、允许/阻止特定的用户或者目录的访问、禁止目录列表、配置默认文档等功能。
+> 注意这几个字“改变文件扩展名”，后面会用到
+
+尝试传入jpg文件（一句话木马不变）<br />回显结果是否会有所不同<br />![image.png](https://cdn.nlark.com/yuque/0/2023/png/36016220/1699943802167-bdbd0dfa-673e-4d42-826b-db40fdf8d007.png#averageHue=%23f8f7f7&clientId=u3b3bf35b-d4c8-4&from=paste&height=726&id=u89ed5ed3&originHeight=908&originWidth=1718&originalType=binary&ratio=1.25&rotation=0&showTitle=false&size=184491&status=done&style=none&taskId=ud2b55a87-0579-4f56-a61d-9282669ebfb&title=&width=1374.4)
+> 发现上传成功
+> 访问上传的文件
+> ![image.png](https://cdn.nlark.com/yuque/0/2023/png/36016220/1699943880370-5f441f6b-8618-47c5-b4cb-12f792765786.png#averageHue=%23292929&clientId=u3b3bf35b-d4c8-4&from=paste&height=784&id=uf59c848c&originHeight=980&originWidth=1919&originalType=binary&ratio=1.25&rotation=0&showTitle=false&size=52633&status=done&style=none&taskId=ubd9535fe-abd7-445d-883e-207b5e96868&title=&width=1535.2)
+> 图片加载失败
+> 到这里猜想使用中国蚁剑是连接不成功的
+> 不过咱们还是按照正常程序走一遍比较好
+
+使用中国蚁剑进行连接<br />![image.png](https://cdn.nlark.com/yuque/0/2023/png/36016220/1699944078968-56041b8b-ed47-4c89-be93-30f1fc8c003d.png#averageHue=%23f2f1ef&clientId=u3b3bf35b-d4c8-4&from=paste&height=864&id=h2zA3&originHeight=1080&originWidth=1920&originalType=binary&ratio=1.25&rotation=0&showTitle=false&size=105477&status=done&style=none&taskId=u711bea65-67b9-42b6-81aa-086b83436cb&title=&width=1536)
+> 返回数据为空
+> 到这里我们的一句话木马并没有被识别出来，或者说并没有执行，猜测被拦截
+> 尝试上传更改后的.htaccess文件
+
+上传.htaccess文件
+```php
+<FileMatch "1.jpg>
+SetHandler application/x-httpd-php
+</FileMatch>
+```
+> 上传的一句话木马文件要和1.jpg文件名一模一样
+> 可以把这段代码理解为，将1.jpg文件内容当作PHP文件执行
+
+![image.png](https://cdn.nlark.com/yuque/0/2023/png/36016220/1699944601972-04889d4a-6686-4da9-b4cb-aa8b1f14fcef.png#averageHue=%23f8f7f7&clientId=u3b3bf35b-d4c8-4&from=paste&height=754&id=u5ec0c426&originHeight=942&originWidth=1725&originalType=binary&ratio=1.25&rotation=0&showTitle=false&size=367197&status=done&style=none&taskId=ua4ba77ec-0c11-4482-af56-cf9747d282d&title=&width=1380)
+> 发现被拦截了，更改内容类型为image/jpeg进行绕过
+
+更改Content-Type内容类型为:image/jpeg<br />![image.png](https://cdn.nlark.com/yuque/0/2023/png/36016220/1699944734280-3db3114a-1ae9-4c25-95ea-d11b4206eab3.png#averageHue=%23f7f7f7&clientId=u3b3bf35b-d4c8-4&from=paste&height=728&id=uc5e31f01&originHeight=910&originWidth=1718&originalType=binary&ratio=1.25&rotation=0&showTitle=false&size=189464&status=done&style=none&taskId=u8e720367-14ee-44fa-89b9-90c7917c49b&title=&width=1374.4)
+> .htaccess文件上传成功
+
+再次上传1.jpg的木马文件<br />![image.png](https://cdn.nlark.com/yuque/0/2023/png/36016220/1699944965445-687f05af-adb8-4647-b282-ed3ffdac794f.png#averageHue=%23f8f7f7&clientId=u3b3bf35b-d4c8-4&from=paste&height=725&id=u2ac64e9c&originHeight=906&originWidth=1718&originalType=binary&ratio=1.25&rotation=0&showTitle=false&size=187867&status=done&style=none&taskId=u8cdd2426-2571-4743-aa16-6add598d1c2&title=&width=1374.4)<br />![image.png](https://cdn.nlark.com/yuque/0/2023/png/36016220/1699945011943-6b907b56-7038-447e-8513-4ed54b64ae5c.png#averageHue=%23fcfcfb&clientId=u3b3bf35b-d4c8-4&from=paste&height=279&id=ud2d1c306&originHeight=349&originWidth=1920&originalType=binary&ratio=1.25&rotation=0&showTitle=false&size=36287&status=done&style=none&taskId=u2385075d-1bca-4f48-94f5-24971ffb98b&title=&width=1536)
+> 上传成功
+> 访问成功
+> 尝试使用蚁剑进行连接
+
+使用中国蚁剑进行连接<br />![image.png](https://cdn.nlark.com/yuque/0/2023/png/36016220/1699945157083-feb31adc-20b1-42f3-8cbe-151527982fd1.png#averageHue=%23f2f2f2&clientId=u3b3bf35b-d4c8-4&from=paste&height=864&id=u3e650151&originHeight=1080&originWidth=1920&originalType=binary&ratio=1.25&rotation=0&showTitle=false&size=109077&status=done&style=none&taskId=u6c148fe9-e78d-4a71-a3e1-c905dc4c98a&title=&width=1536)<br />![image.png](https://cdn.nlark.com/yuque/0/2023/png/36016220/1699945192353-8efe2da0-59b5-480b-b443-1eb3c11a4365.png#averageHue=%23f3f3f3&clientId=u3b3bf35b-d4c8-4&from=paste&height=864&id=ua25681a3&originHeight=1080&originWidth=1920&originalType=binary&ratio=1.25&rotation=0&showTitle=false&size=145463&status=done&style=none&taskId=ub59ce843-a786-441c-9336-aacfb7e466b&title=&width=1536)<br />![image.png](https://cdn.nlark.com/yuque/0/2023/png/36016220/1699945220372-50f9b7d4-12a7-4b13-91db-328bdc3c99c2.png#averageHue=%23efefee&clientId=u3b3bf35b-d4c8-4&from=paste&height=194&id=u692dda44&originHeight=243&originWidth=1920&originalType=binary&ratio=1.25&rotation=0&showTitle=false&size=26437&status=done&style=none&taskId=u92427d98-bf87-4f3b-96cc-c4473c39097&title=&width=1536)<br />**得到flag：**<br />`flag{11711c03-702e-43ac-b1fe-fec6c5297260}`
+
+原文链接：https://blog.csdn.net/m0_73734159/article/details/134399554?spm=1001.2014.3001.5501
+
 
 
 
