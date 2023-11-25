@@ -1132,6 +1132,63 @@ SQL注入字典查过滤字符<br />![image.png](https://cdn.nlark.com/yuque/0/2
 
 原文链接：https://blog.csdn.net/m0_73734159/article/details/134450773?csdn_share_tail=%7B%22type%22%3A%22blog%22%2C%22rType%22%3A%22article%22%2C%22rId%22%3A%22134450773%22%2C%22source%22%3A%22m0_73734159%22%7D
 
+## BUUCTF [MRCTF2020]Ez_bypass 1
+
+题目环境：<br />![image.png](https://cdn.nlark.com/yuque/0/2023/png/36016220/1700911535943-147a39ff-efb1-4f2f-878b-beb04ff8ab98.png#averageHue=%23f2f0ed&clientId=u2735342b-9b67-4&from=paste&height=174&id=u7249e796&originHeight=218&originWidth=1920&originalType=binary&ratio=1.25&rotation=0&showTitle=false&size=56193&status=done&style=none&taskId=u3b76bfc6-27d9-4002-8366-5cd393336d3&title=&width=1536)<br />F12查看源代码<br />![image.png](https://cdn.nlark.com/yuque/0/2023/png/36016220/1700911646282-517108e1-a56a-4edc-b948-ed0e28bd5e05.png#averageHue=%23fbfbfb&clientId=u2735342b-9b67-4&from=paste&height=677&id=u79c09b97&originHeight=846&originWidth=1918&originalType=binary&ratio=1.25&rotation=0&showTitle=false&size=59836&status=done&style=none&taskId=u98c30f2f-40a1-497d-bafe-0466afd9c78&title=&width=1534.4)
+```php
+I put something in F12 for you  
+	include 'flag.php';  
+$flag='MRCTF{xxxxxxxxxxxxxxxxxxxxxxxxx}';  
+if(isset($_GET['gg'])&&isset($_GET['id'])) {  
+	$id=$_GET['id'];  
+	$gg=$_GET['gg'];  
+	if (md5($id) === md5($gg) && $id !== $gg) {  
+		echo 'You got the first step';  
+		if(isset($_POST['passwd'])) {  
+			$passwd=$_POST['passwd'];  
+			if (!is_numeric($passwd))  
+			{  
+				if($passwd==1234567)  
+				{  
+					echo 'Good Job!';  
+					highlight_file('flag.php');  
+					die('By Retr_0');  
+				}  
+				else  
+				{  
+					echo "can you think twice??";  
+				}  
+			}  
+			else{  
+				echo 'You can not get it !';  
+			}  
+		}  
+		else{  
+			die('only one way to get the flag');  
+		}  
+	}  
+	else {  
+		echo "You are not a real hacker!";  
+	}  
+}  
+else{  
+	die('Please input first');  
+}  
+}Please input first 
+```
+PHP代码审计
+> 分析源码关键点
+> 获取flag的思路：
+> 需要满足两个条件：
+> GET传参方式
+>       - "==="；md5值强对比；id与gg的值不能相等；可通过数组并赋不同的值进行绕过。
+> 
+POST传参方式
+>       - !is_numeric函数决定了passwd参数的值是数字或数字字符串，加个!就是相反的意思，如果passwd是数字字符串并等于1234567那么就会输出flag的值，如果不是那么就会进入else语句。
+
+火狐浏览器传参<br />GET payload：<br />`?id[]=1&gg[]=2`<br />POST payload：<br />`passwd=1234567a`<br />![image.png](https://cdn.nlark.com/yuque/0/2023/png/36016220/1700912843071-5ca749ca-622f-4c23-84ac-3bba497d62c5.png#averageHue=%23d6a160&clientId=u2735342b-9b67-4&from=paste&height=864&id=u53972d8a&originHeight=1080&originWidth=1920&originalType=binary&ratio=1.25&rotation=0&showTitle=false&size=161118&status=done&style=none&taskId=uba3d4d38-9287-40a1-a7b1-90a68a19b54&title=&width=1536)<br />**得到flag：**<br />`flag{95c8f35d-4ce2-4ba8-a849-2bbd941a75ea}`
+
+原文链接：https://blog.csdn.net/m0_73734159/article/details/134619162?spm=1001.2014.3001.5501
 
 
 
